@@ -14,6 +14,10 @@ library(colorRamps)
 library(car)
 library(emmeans)
 
+
+# this is bills stuff
+
+
 #read in the data ----
 seed_yield.df <- read_csv("Data/Seed Yield.csv") %>%
   clean_names() %>%
