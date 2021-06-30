@@ -30,16 +30,16 @@ decomp.df <- decomp.df %>%
 #   group_by(spp) %>% 
 #   summarize(pct_mass_remain = 100-mean(pct_mass_remain, na.rm=TRUE))
 # 
-# correct mass remaining
-decomp.df <- decomp.df %>%
-  mutate(pct_mass_remain = case_when(
-    spp == "PC"   & time ==0  ~ pct_mass_remain + 2.0582047,
-    spp == "GM_PC"& time ==0 ~ pct_mass_remain + -0.2269507,
-    spp == "AR"   & time ==0 ~ pct_mass_remain + 7.1806311,
-    spp == "CR"   & time ==0 ~ pct_mass_remain + 7.4213231,
-    TRUE ~ pct_mass_remain
-
-  ))
+# # correct mass remaining
+# decomp.df <- decomp.df %>%
+#   mutate(pct_mass_remain = case_when(
+#     spp == "PC"   & time == 1  ~ pct_mass_remain + 2.0582047,
+#     spp == "GM_PC"& time == 1 ~ pct_mass_remain + -0.2269507,
+#     spp == "AR"   & time == 1 ~ pct_mass_remain + 7.1806311,
+#     spp == "CR"   & time == 1 ~ pct_mass_remain + 7.4213231,
+#     TRUE ~ pct_mass_remain
+# 
+#   ))
 
 
 
@@ -50,7 +50,7 @@ decomp.df %>%
                geom = "point",
                size = 3,
                position = position_dodge(.2)) +
-  stat_summary(fun.data = mean_sdl, na.rm = TRUE, fun.args = list(mult = 1),
+  stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar",
                width = 0.2,
                position = position_dodge(.2)) 
