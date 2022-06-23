@@ -1,5 +1,7 @@
 library(tidyverse)
 library(janitor)
+library(dplyr)
+library(ggplot2)
 
 # read in file
 decomp.df <- read_csv("data/decomp_biomass.csv") %>% clean_names()
@@ -44,8 +46,8 @@ decomp.df <- decomp.df %>%
 
 
 # look at the graph
-decomp.df %>% 
-  ggplot(aes(time, pct_mass_remain, color=spp)) +
+plot1 <- decomp.df %>% 
+  ggplot(aes(days, pct_mass_remain, color=spp)) +
   stat_summary(fun = mean, na.rm = TRUE,
                geom = "point",
                size = 3,
@@ -53,8 +55,15 @@ decomp.df %>%
   stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar",
                width = 0.2,
-               position = position_dodge(.2)) 
+               position = position_dodge(.2)) +
+  stat_summary(fun = mean, na.rm = TRUE,
+               geom = "line",
+               size = 3)
+  
 
+
+
+ggsave(file="figures/pct_mass_remaining.pdf", plot1, width = 6, height =6, unit = "in")
 
 # or this
 decomp.df %>% 
@@ -66,11 +75,11 @@ decomp.df %>%
 # we want to make sub datasets --
 pc.df <- decomp.df %>% 
   filter(spp == "PC" & soil_block %in% c(1,2)) %>%
-  select(time, row_no, pct_mass_remain) 
+  select(days, row_no, pct_mass_remain) 
   
   # plot again
 pc.df  %>% 
-  ggplot(aes(time, pct_mass_remain, color=as.factor(row_no))) +
+  ggplot(aes(days, pct_mass_remain, color=as.factor(row_no))) +
   geom_point() +
   geom_smooth(method = "lm")
 
@@ -79,7 +88,7 @@ deco <- pc.df %>%
   rename(
     rep = row_no,
     Mt = pct_mass_remain,
-    t = time
+    t = days
   )
 
 # nonlin = nls(pct_mass_remain ~ 1*exp(-k*time), trace=TRUE, start = list(k = .01), data=pc_b1.df)
@@ -173,3 +182,4 @@ plot(s1$t,pred[,3],xlab="Days",ylab="Predictions")
 points(s1$t,obs[,1],col="red") 
 #points command explanation:
 #points(x data, ydata, point color = red)
+
