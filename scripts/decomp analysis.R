@@ -2,6 +2,7 @@
 library(tidyverse)
 library(janitor)
 library(patchwork)
+library(readxl)
 
 # READ IN THE DATA ----
 # reads in decomp and n data ----
@@ -115,12 +116,39 @@ decomp.df <- decomp.df %>%
 # here we work the n in biomass data into the dataframe
 # first thing i need to do is divide percents by 100 so they are properly expressed as percent
 decomp.df <- decomp.df %>%
-  mutate(percent_n = percent_n / 100,
-         percent_c = percent_c / 100)
+  mutate(prop_n = percent_n / 100,
+         prop_c = percent_c / 100)
 
 # next i multiply percent n by the final weight of our sample to get the grams of n in the sample
 decomp.df <- decomp.df %>%
-  mutate(total_n_g = percent_n * coll_wt_g)
+  mutate(total_n_g = prop_n * coll_wt_g)
+
+
+
+
+
+decomp.df <- decomp.df %>%
+  arrange(spp, days, soil_block, row)
+write_csv(decomp.df, "output/decomp_data_with_pct_n.csv")
+
+# %>% 
+#   filter(days != 63)
+
+# 
+# 
+# decomp.df <- decomp.df %>% 
+#   filter(days != 7) %>% 
+#   filter(days != 21) %>% 
+#   filter(days != 28) %>% 
+#   filter(days != 49) 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# STARhere::
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+decomp.df <- read_excel("output/decomp_data_with_pct_n FOR ANALYSIS.xlsx")
+
+
 
 # SOME QUICK PLOTS TO SEE HOW THINGS LOOK ----
 # some odd outliers in here
@@ -138,9 +166,7 @@ decomp.df %>%
 # create dataframe
 pc <- decomp.df %>% 
   filter(!is.na(days)) %>% 
-  filter(spp=="PC")  %>% 
-  filter(days != 63) %>% 
-  filter(days != 28) %>% 
+  filter(spp=="PC") %>% 
   select(row_no, pct_mass_remain, days ) %>% 
   rename(
     rep = row_no,
@@ -148,12 +174,19 @@ pc <- decomp.df %>%
     t = days
   ) %>% 
   mutate(Mt = Mt/100) %>% 
-  filter(rep != 99999)
+  filter(rep != 99999) 
+
+pc %>%
+  ggplot(aes(t, Mt)) +
+  stat_summary(
+    fun = mean, na.rm = TRUE, geom = "point", size = 4) +
+  stat_summary(
+    fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = .3, size = .7)
 
 # set up nonlinear regression
 nonlin = nls(Mt ~ 1*exp(-k*t), trace=TRUE, start = list(k = .01), data=pc)
 
-rm(nonlin)
+# rm(nonlin)
 
 # create a vector to store k values
 # estimated for each set of measurements with the same "rep" number:
@@ -165,15 +198,15 @@ k=numeric(max(pc$rep))
 
 
 #create an array to store predicted mass remaining values
-pred=array(0, dim=c(7, max(pc$rep)))	
+pred=array(0, dim=c(4, max(pc$rep)))	
 #	array(all values = 0,dim=c(no. of rows=number of time steps, columns=number of reps)
 
 #create an array to store the model residuals
-resid=array(0, dim=c(7, max(pc$rep)))	
+resid=array(0, dim=c(4, max(pc$rep)))	
 #	as above
 
 #create an array to store the observed values for making graphs
-obs=array(0, dim=c(7, max(pc$rep)))	
+obs=array(0, dim=c(4, max(pc$rep)))	
 
 # nonlinear regression 
 
