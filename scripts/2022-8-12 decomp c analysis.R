@@ -84,8 +84,17 @@ full.df <- full.df %>%
 
 # plot it again to see if I removed the correct days, yep looks good
 full.df %>%
-  ggplot(mapping = aes(days, total_n_g, color = spp)) +
+  ggplot(mapping = aes(days, total_c_g, color = spp)) +
   geom_point()
+
+# IMPORTANT NOTE ----
+# this might not be a negative exponential, going to do a mean se plot to get a better look
+
+full.df %>%
+  ggplot(mapping = aes(days, total_c_g, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
 
 # NONLINEAR MODELS ----
 
