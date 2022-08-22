@@ -123,6 +123,13 @@ full.df %>%
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar") +
   theme_classic()
 
+# how does it look by time?
+full.df %>%
+  ggplot(mapping = aes(days, k, color = spp)) +
+  stat_summary(fun =  mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
+
 # this figure follows similar trends as the nonlinear model we made with the other data so it looks good so far,
 # will do statistical analysis on these data 
 

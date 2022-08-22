@@ -710,14 +710,6 @@ ggplot(aes(x=sp)) +
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   theme_classic()
 
-# # days
-# full.df %>%
-#   ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp)) +
-#   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
-#   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-#   labs(x = "Days after Placement", y = "Mean Percent Mass Remaining") +
-#   theme_classic()
-
 # days on n ----
 prop_n.plot <- full.df %>%
   mutate(prop_n = prop_n * 100) %>%
