@@ -56,6 +56,13 @@ decomp.df <- decomp.df %>%
     TRUE ~ pct_mass_remain
   ))
 
+# PLOT TO LOOK AT THE NEGATIVE EXPONENTIALS ----
+decomp.df %>%
+  ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
+
 # NONLINEAR MODELS ----
 
 # pc ----

@@ -96,6 +96,89 @@ full.df %>%
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
 
+# NEGATIVE EXPONENTIAL NOT WORKING ----
+
+# think it is because there is not a very strong negative exponential relationship,
+# trying to work with this below 
+
+# so it loks like this is not a very strong negative exponential relationship,
+# which may be why the nonlinear model isn't working, will set day 0 to be 1,
+# so the math works and try the equation below
+
+full.df <- full.df %>%
+  mutate(days = case_when(
+    days == 0 ~ 1,
+    TRUE ~ days
+  ))
+
+# a test for determining k values
+full.df <- full.df %>%
+  mutate(k = -log(coll_wt_g / initial_wt_g) / days)
+
+# so it seemed like this worked, will graph it up to see how it looks
+
+full.df %>%
+  ggplot(mapping = aes(spp, k, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar") +
+  theme_classic()
+
+# this figure follows similar trends as the nonlinear model we made with the other data so it looks good so far,
+# will do statistical analysis on these data 
+
+# LINEAR MODEL STATISTICS ----
+
+# create model ----
+one.lm = lm(k ~ spp * soil_block, data = full.df)
+
+# check assumptions of model ----
+residuals <- resid(one.lm)
+plot(fitted(one.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
+
+# log transform ----
+# doesnt seem to really fit homogeneity of variance or normality of residuals, what about log?
+full.df <- full.df %>%
+  mutate(log_k = log(k))
+
+# log model ----
+# create model ----
+one.lm = lm(log_k ~ spp * soil_block, data = full.df)
+
+# check assumptions of model ----
+residuals <- resid(one.lm)
+plot(fitted(one.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
+
+# while this could be better, it definely helped so right now I am going to go with it 
+
+# run model ----
+Anova(one.lm, type = 3)
+
+# RESULTS OF ANOVA ----
+
+# fail to reject Ho: the mean difference in decomposition rate between all groups is equal to 0 
+
+# POST F TESTS ----
+
+# post f tests to determine where the differences between groups are 
+
+# create emmeans model ----
+one.emm <- emmeans(one.lm, ~ sp)
+
+# plot emmeans ----
+plot(one.emm, comparisons = TRUE)
+
+# mean separation ----
+# where are the differences in groups and what are the emmeans?
+multcomp::cld(one.emm, Letters = letters, adjust = "Bonferroni")
+
+# p-values ----
+emminteraction = emmeans(one.emm, pairwise ~ sp, adjust = "bonferroni", alpha = 0.5)
+emminteraction$contrasts
+
 # NONLINEAR MODELS ----
 
 # pc ----
