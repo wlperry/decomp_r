@@ -56,40 +56,53 @@ full.df <- full.df %>%
     TRUE ~ 99999
   ) )
 
-# N IN BIOMASS ----
+# CALCS FOR PROP N REMAINING ----
 
-# proportion of n in biomass then get grams of n in sample
+# first need day 0 porportion of n * initial wt for how much n in initial weight
+# calculate proportion n 
+full.df <- full.df %>% 
+  mutate(prop_n = percent_n / 100)
+
+# now we need day 0 and by species 
+initial_prop_n.df <- full.df %>%
+  filter(days == 0) %>%
+  group_by(spp) %>%
+  summarize(initial_prop_n = mean(prop_n))
+
+# we then multiply each sample by the initial prop n to get the initial n for every sample
 full.df <- full.df %>%
-  mutate(prop_n = percent_n / 100,
-         prop_c = percent_c / 100,
-         total_n_g = prop_n * coll_wt_g,
-         total_c_g = prop_c * coll_wt_g)
+  mutate(initial_prop_n = case_when(
+    spp == "PC" ~ initial_wt_g * 0.01872000,
+    spp == "GM_PC" ~ initial_wt_g * 0.01595455,
+    spp == "AR" ~ initial_wt_g * 0.01711000,
+    spp == "CR" ~ initial_wt_g * 0.01439000
+  ))
 
-
-# grams of n in sample
+# now we take collected weight and multiply by the collected prop n to get collected n
 full.df <- full.df %>%
-  mutate(total_n_g = prop_n * coll_wt_g)
+  mutate(collected_prop_n = coll_wt_g * prop_n)
 
-# QUICK PLOT TO SEE HOW THINGS LOOK ----
+# finally divide initial by collected to get prop n remaining then * 100 for pct
+full.df <- full.df %>%
+  mutate(prop_n_remain = collected_prop_n / initial_prop_n) %>%
+  mutate(pct_n_remaing = prop_n_remain * 100)
 
+# graph it to see how it looks
 full.df %>%
-  ggplot(mapping = aes(days, total_n_g, color = spp)) +
-  geom_point()
+  ggplot(mapping = aes(days, pct_n_remaing, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
 
-# gonna have to get rid of those weird days that got sampled
+# gonna remove those problem days 
 unique(full.df$days)
 
 full.df <- full.df %>%
   filter(days == 0 | days == 14 | days == 35 | days == 63)
 
-# plot it again to see if I removed the correct days, yep looks good
+# graph it to see how it looks
 full.df %>%
-  ggplot(mapping = aes(days, total_n_g, color = spp)) +
-  geom_point()
-
-# do this as a mean se plot to get a better look at negative exponential
-full.df %>%
-  ggplot(mapping = aes(days, total_n_g, color = spp)) +
+  ggplot(mapping = aes(days, pct_n_remaing, color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
@@ -99,10 +112,10 @@ full.df %>%
 # pc ----
 pc <- full.df %>% 
   filter(spp=="PC")  %>% 
-  select(row, total_n_g, days ) %>% 
+  select(row, pct_n_remaing, days ) %>% 
   rename(
     rep = row,
-    Mt = total_n_g,
+    Mt = pct_n_remaing,
     t = days
   ) %>% 
   filter(rep != 99999)
@@ -117,8 +130,8 @@ average.df <- pc %>%
 # found the value I need so I use add row to work it into the data frame and get a full set
 
 pc <- pc %>%
-  add_row(rep = 3, Mt = 0.333019, t = 63) %>%
-  add_row(rep = 5, Mt = 0.333019, t = 65)
+  add_row(rep = 3, Mt = 72.1786, t = 63) %>%
+  add_row(rep = 5, Mt = 72.1786, t = 63)
 
 # so this works!!!
 nonlin = nls(Mt ~ 1*exp(-k*t), trace=TRUE, start = list(k = .01), data=pc)
@@ -220,10 +233,10 @@ pc_n_k_nonlin.df <- as.data.frame(k)
 # gm ----
 gm <- full.df %>% 
   filter(spp=="GM_PC")  %>% 
-  select(row, total_n_g, days ) %>% 
+  select(row, pct_n_remaing, days ) %>% 
   rename(
     rep = row,
-    Mt = total_n_g,
+    Mt = pct_n_remaing,
     t = days
   ) %>% 
   filter(rep != 99999)
@@ -251,9 +264,9 @@ average.df <- gm %>%
   summarize(average = mean(Mt))
 
 gm <- gm %>%
-  add_row(rep = 3, Mt = 0.3160303, t = 63) %>%
-  add_row(rep = 5, Mt = 0.3160303, t = 63) %>%
-  add_row(rep = 10, Mt = 0.3859748, t = 0)
+  add_row(rep = 3, Mt = 80.69591, t = 63) %>%
+  add_row(rep = 5, Mt = 80.69591, t = 63) %>%
+  add_row(rep = 10, Mt = 98.23760, t = 0)
 
 
 # so this works!!!
@@ -356,10 +369,10 @@ gm_n_k_nonlin.df <- as.data.frame(k)
 # ar ----
 ar <- full.df %>% 
   filter(spp=="AR")  %>% 
-  select(row, total_n_g, days ) %>% 
+  select(row, pct_n_remaing, days ) %>% 
   rename(
     rep = row,
-    Mt = total_n_g,
+    Mt = pct_n_remaing,
     t = days
   ) %>% 
   filter(rep != 99999)
@@ -373,9 +386,9 @@ average.df <- ar %>%
   summarize(average = mean(Mt))
 
 ar <- ar %>%
-  add_row(rep = 6, Mt = 0.2607713, t = 35) %>%
-  add_row(rep = 3, Mt = 0.2228666, t = 63) %>%
-  add_row(rep = 5, Mt = 0.2228666, t = 63)
+  add_row(rep = 6, Mt = 65.79177, t = 35) %>%
+  add_row(rep = 3, Mt = 55.93470, t = 63) %>%
+  add_row(rep = 5, Mt = 55.93470, t = 63)
 
 
 # so this works!!!
@@ -478,10 +491,10 @@ ar_n_k_nonlin.df <- as.data.frame(k)
 # cr ----
 cr <- full.df %>% 
   filter(spp=="CR")  %>% 
-  select(row, total_n_g, days ) %>% 
+  select(row, pct_n_remaing, days ) %>% 
   rename(
     rep = row,
-    Mt = total_n_g,
+    Mt = pct_n_remaing,
     t = days
   ) %>% 
   filter(rep != 99999)
@@ -495,9 +508,9 @@ average.df <- cr %>%
   summarize(average = mean(Mt))
 
 cr <- cr %>%
-  add_row(rep = 3, Mt = 0.2312555, t = 63) %>%
-  add_row(rep = 5, Mt = 0.2312555, t = 63) %>%
-  add_row(rep = 6, Mt = 0.2312555, t = 63)
+  add_row(rep = 3, Mt = 70.26713, t = 63) %>%
+  add_row(rep = 5, Mt = 70.26713, t = 63) %>%
+  add_row(rep = 6, Mt = 70.26713, t = 63)
 
 
 # so this works!!!
@@ -600,16 +613,16 @@ cr_n_k_nonlin.df <- as.data.frame(k)
 # clean files ----
 
 cr_n_k_nonlin.df <- cr_n_k_nonlin.df %>% 
-  mutate(sp="cr")
+  mutate(spp="cr")
 
 ar_n_k_nonlin.df <- ar_n_k_nonlin.df %>% 
-  mutate(sp="ar")
+  mutate(spp="ar")
 
 pc_n_k_nonlin.df <- pc_n_k_nonlin.df %>% 
-  mutate(sp="pc")
+  mutate(spp="pc")
 
 gm_n_k_nonlin.df <- gm_n_k_nonlin.df %>% 
-  mutate(sp="gm_pc")
+  mutate(spp="gm_pc")
 
 # put all of the k values together ----
 nonlin_n_k.df <- bind_rows(pc_n_k_nonlin.df,gm_n_k_nonlin.df, 
@@ -629,17 +642,18 @@ nonlin_n_k.df <- nonlin_n_k.df %>%
 
 # plot raw values ----
 nonlin_n_k.df %>%
-  ggplot(mapping = aes(sp, k)) +
+  ggplot(mapping = aes(spp, k)) +
   geom_point() +
   theme_classic()
 
 # mean standard error plot ----
 nonlin_n_k.df %>%
-  ggplot(mapping = aes(sp, k, color = soil_block)) +
+  ggplot(mapping = aes(spp, k, color = soil_block)) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 0.2, 
                position = position_dodge2(.2)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4,
-               position = position_dodge2(.2))
+               position = position_dodge2(.2)) + 
+  theme_classic()
 
 # STATISTICAL ANALYSIS ----
 
