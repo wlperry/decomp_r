@@ -643,6 +643,17 @@ k_average.df <- nonlin_k.df %>%
   group_by(sp) %>%
   summarize(avg = mean(k),
             sd = sd(k)) 
+
+# SAVES FILE IN OUTPUT FOR PLOTTING ----
+
+# emmeans ----
+write_csv(k_nonlin.emmeans, file = "output/final/biomass_k_emmeans.csv")
+
+# biomass data ----
+write_csv(decomp.df, file = "output/final/biomass_loss.csv")
+
+
+
 # STOP HERE ----
 
 # # LINEAR ESTIMATES ----

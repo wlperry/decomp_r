@@ -6,6 +6,7 @@ library(broom)
 library(car)
 library(emmeans)
 library(patchwork)
+library(multcompView)
 
 # READ IN THE DATA ----
 
@@ -85,11 +86,11 @@ full.df <- full.df %>%
 # finally divide initial by collected to get prop n remaining then * 100 for pct
 full.df <- full.df %>%
   mutate(prop_n_remain = collected_prop_n / initial_prop_n) %>%
-  mutate(pct_n_remaing = prop_n_remain * 100)
+  mutate(pct_n_remain = prop_n_remain * 100)
 
 # graph it to see how it looks
 full.df %>%
-  ggplot(mapping = aes(days, pct_n_remaing, color = spp)) +
+  ggplot(mapping = aes(days, pct_n_remain, color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
@@ -102,7 +103,7 @@ full.df <- full.df %>%
 
 # graph it to see how it looks
 full.df %>%
-  ggplot(mapping = aes(days, pct_n_remaing, color = spp)) +
+  ggplot(mapping = aes(days, pct_n_remain, color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
@@ -112,12 +113,13 @@ full.df %>%
 # pc ----
 pc <- full.df %>% 
   filter(spp=="PC")  %>% 
-  select(row, pct_n_remaing, days ) %>% 
+  select(row, pct_n_remain, days ) %>% 
   rename(
     rep = row,
-    Mt = pct_n_remaing,
+    Mt = pct_n_remain,
     t = days
   ) %>% 
+  mutate(Mt = Mt / 100) %>%
   filter(rep != 99999)
 
 # okay, we are missing reps 3 and 5 from t = 63 in this dataframe, 
@@ -126,12 +128,11 @@ average.df <- pc %>%
   filter(t == 63) %>%
   group_by(t) %>%
   summarize(average = mean(Mt))
-
 # found the value I need so I use add row to work it into the data frame and get a full set
 
 pc <- pc %>%
-  add_row(rep = 3, Mt = 72.1786, t = 63) %>%
-  add_row(rep = 5, Mt = 72.1786, t = 63)
+  add_row(rep = 3, Mt = 0.721786, t = 63) %>%
+  add_row(rep = 5, Mt = 0.721786, t = 63)
 
 # so this works!!!
 nonlin = nls(Mt ~ 1*exp(-k*t), trace=TRUE, start = list(k = .01), data=pc)
@@ -233,12 +234,13 @@ pc_n_k_nonlin.df <- as.data.frame(k)
 # gm ----
 gm <- full.df %>% 
   filter(spp=="GM_PC")  %>% 
-  select(row, pct_n_remaing, days ) %>% 
+  select(row, pct_n_remain, days ) %>% 
   rename(
     rep = row,
-    Mt = pct_n_remaing,
+    Mt = pct_n_remain,
     t = days
   ) %>% 
+  mutate(Mt = Mt / 100) %>%
   filter(rep != 99999)
 
 # start by removing the extra 10s
@@ -264,9 +266,9 @@ average.df <- gm %>%
   summarize(average = mean(Mt))
 
 gm <- gm %>%
-  add_row(rep = 3, Mt = 80.69591, t = 63) %>%
-  add_row(rep = 5, Mt = 80.69591, t = 63) %>%
-  add_row(rep = 10, Mt = 98.23760, t = 0)
+  add_row(rep = 3, Mt = 0.8069591, t = 63) %>%
+  add_row(rep = 5, Mt = 0.8069591, t = 63) %>%
+  add_row(rep = 10, Mt = 0.9823760, t = 0)
 
 
 # so this works!!!
@@ -369,12 +371,13 @@ gm_n_k_nonlin.df <- as.data.frame(k)
 # ar ----
 ar <- full.df %>% 
   filter(spp=="AR")  %>% 
-  select(row, pct_n_remaing, days ) %>% 
+  select(row, pct_n_remain, days ) %>% 
   rename(
     rep = row,
-    Mt = pct_n_remaing,
+    Mt = pct_n_remain,
     t = days
   ) %>% 
+  mutate(Mt = Mt / 100) %>%
   filter(rep != 99999)
 
 # missing t35 rep6, t63 rep3 | 5
@@ -386,9 +389,9 @@ average.df <- ar %>%
   summarize(average = mean(Mt))
 
 ar <- ar %>%
-  add_row(rep = 6, Mt = 65.79177, t = 35) %>%
-  add_row(rep = 3, Mt = 55.93470, t = 63) %>%
-  add_row(rep = 5, Mt = 55.93470, t = 63)
+  add_row(rep = 6, Mt = 0.6579177, t = 35) %>%
+  add_row(rep = 3, Mt = 0.5593470, t = 63) %>%
+  add_row(rep = 5, Mt = 0.5593470, t = 63)
 
 
 # so this works!!!
@@ -489,14 +492,15 @@ write_csv(as.data.frame(k), file="output/ar_n k nonlin values.csv")
 ar_n_k_nonlin.df <- as.data.frame(k)
 
 # cr ----
-cr <- full.df %>% 
+cr <- ar <- full.df %>% 
   filter(spp=="CR")  %>% 
-  select(row, pct_n_remaing, days ) %>% 
+  select(row, pct_n_remain, days ) %>% 
   rename(
     rep = row,
-    Mt = pct_n_remaing,
+    Mt = pct_n_remain,
     t = days
   ) %>% 
+  mutate(Mt = Mt / 100) %>%
   filter(rep != 99999)
 
 # missing t63 rep 3 | 5 | 6
@@ -508,9 +512,9 @@ average.df <- cr %>%
   summarize(average = mean(Mt))
 
 cr <- cr %>%
-  add_row(rep = 3, Mt = 70.26713, t = 63) %>%
-  add_row(rep = 5, Mt = 70.26713, t = 63) %>%
-  add_row(rep = 6, Mt = 70.26713, t = 63)
+  add_row(rep = 3, Mt = 0.7026713, t = 63) %>%
+  add_row(rep = 5, Mt = 0.7026713, t = 63) %>%
+  add_row(rep = 6, Mt = 0.7026713, t = 63)
 
 
 # so this works!!!
@@ -658,7 +662,7 @@ nonlin_n_k.df %>%
 # STATISTICAL ANALYSIS ----
 
 # create model ----
-one.lm = lm(k ~ sp*soil_block, data = nonlin_n_k.df)
+one.lm = lm(k ~ spp * soil_block, data = nonlin_n_k.df)
 
 # check assumptions of model ----
 residuals <- resid(one.lm)
@@ -673,16 +677,16 @@ Anova(one.lm, type = 3)
 
 # RESULTS OF ANOVA ----
 
-# Reject null hypotheis that the difference in means between any two groups = 0. 
-# No significant interaction between spp and block p=0.1,
-# significant effect of spp p<8.96E-9 no effect of soil block p=0.06
+# Reject null hypotheis that the difference in means between any two groups is not 0. 
+# significant interaction between spp and block p=0.04,
+# significant effect of spp p<0.0001 no effect of soil block p=0.1
 
 # POST F TESTS ----
 
 # from results of anova, going to use emmeans to find differences between groups of spp
 
 # create emmeans model ----
-one.emm <- emmeans(one.lm, ~ sp)
+one.emm <- emmeans(one.lm, ~ spp)
 
 # plot emmeans ----
 plot(one.emm, comparisons = TRUE)
@@ -692,7 +696,7 @@ plot(one.emm, comparisons = TRUE)
 multcomp::cld(one.emm, Letters = letters, adjust = "Bonferroni")
 
 # p-values ----
-emminteraction = emmeans(one.emm, pairwise ~ sp, adjust = "bonferroni", alpha = 0.5)
+emminteraction = emmeans(one.emm, pairwise ~ spp, adjust = "bonferroni", alpha = 0.5)
 emminteraction$contrasts
 
 
@@ -705,32 +709,32 @@ emmeans.df
 
 # relevel factors ----
 emmeans.df <- emmeans.df %>%
-  mutate(sp = as.factor(sp)) 
+  mutate(spp = as.factor(spp)) 
 
 
-# final plot 
+# final plot ----
 emmeans.df %>%
-  mutate(sp = fct_relevel(sp, "pc", "gm_pc", "cr", "ar")) %>%
-ggplot(aes(x=sp)) +
+  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
+ggplot(aes(x=spp)) +
   geom_point(aes(y=emmean), size=3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
   labs(x="Species", y= "k (% nitrogen loss per day)")  +
-  geom_text(aes(x = 1, y = .1, label = "A")) +
-  geom_text(aes(x = 2, y = .1, label = "A")) +
-  geom_text(aes(x = 3, y = .1, label = "B"))+
-  geom_text(aes(x = 4, y = .1, label = "C")) +
+  geom_text(aes(x = 1, y = .015, label = "AB")) +
+  geom_text(aes(x = 2, y = .015, label = "A")) +
+  geom_text(aes(x = 3, y = .015, label = "B"))+
+  geom_text(aes(x = 4, y = .015, label = "C")) +
   scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "AOP2 Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   theme_classic()
+  
 
 # days on n ----
 prop_n.plot <- full.df %>%
-  mutate(prop_n = prop_n * 100) %>%
-  ggplot(mapping = aes(days, prop_n, shape = spp)) +
+  ggplot(mapping = aes(days, pct_n_remaing, shape = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-  labs(x = "Days After Placement", y = "Percent Nitrogen Content in Biomass") +
+  labs(x = "Days After Placement", y = "Percent Nitrogen Remaining") +
   scale_shape_manual(name = "spp", 
                      label = c("Annual Rye", "Cereal Rye", "AOP2 Pennycress", "Pennycress"),
                      values = c(15, 16, 17, 18)) +
@@ -800,6 +804,9 @@ k_average.df <- nonlin_n_k.df %>%
   group_by(sp) %>%
   summarize(avg = mean(k),
             sd = sd(k)) 
+
+# SAVE FILES FOR OUTPUT AND PLOTTING ----
+write_csv(emmeans.df, file = "output/final/nitrogen_k_emmeans.csv")
 
 
 
