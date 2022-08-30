@@ -103,7 +103,39 @@ nitrogen.plot <- full.df %>%
 
 nitrogen.plot
 
-# emmeans 
+# emmeans with spp on x
+# empty shapes with fill for soil - soil type differentially affects decomposition by species 
+# figure of C:N ratios 
+nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
+  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
+  ggplot(aes(x=spp)) +
+  geom_point(aes(y=emmean, shape = spp_soil, group = soil_block), 
+             position = position_dodge2(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE, group = soil_block), 
+                position = position_dodge2(0.3),
+                stat="identity", width = 0.3) + 
+  labs(x="Species", y= "k (% nitrogen loss per day)")  +
+  geom_text(aes(x = 0.9, y = .010, label = "ABC")) +
+  geom_text(aes(x = 1.1, y = .008, label = "AB")) +
+  geom_text(aes(x = 1.9, y = .007, label = "A")) +
+  geom_text(aes(x = 2.1, y = .007, label = "A")) +
+  geom_text(aes(x = 2.9, y = .009, label = "AB"))+
+  geom_text(aes(x = 3.1, y = .011, label = "BCD")) +
+  geom_text(aes(x = 3.9, y = .0125, label = "CD"))+
+  geom_text(aes(x = 4.1, y = .0143, label = "D")) +
+  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc" = "GE Pennycress",
+                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_shape_manual(name = "Soil ",
+                     label = c("Pennycress SA", "Pennycress DR", "GE Pennycress SA",
+                               "GE Pennycress DR", "Cereal Rye SA", "Cereal Rye DR",
+                               "Annual Rye SA", "Annual Rye DR"),
+                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
+  expand_limits(ymin = 0.005, ymax = 0.02) +
+  theme_classic()
+
+nitrogen_emm.plot
+
+# emmeans with spp and soil on x
 nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   mutate(spp = fct_relevel(spp_soil, "pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
                            "cr_1", "cr_2", "ar_1", "ar_2")) %>%
@@ -118,12 +150,15 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_text(aes(x = 2, y = .02, label = "A")) +
   geom_text(aes(x = 3, y = .02, label = "B"))+
   geom_text(aes(x = 4, y = .02, label = "C")) +
-  scale_x_discrete(labels = c("pc_1" = "Pennycress 721A", "pc_2" = "Pennycress 145B2" "gm_pc"= "GE Pennycress",
-                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_x_discrete(labels = c("pc_1" = "Pennycress SA", "pc_2" = "Pennycress DR",
+                              "gm_pc_1" = "GE Pennycress SA", "gm_pc_2" = "GE Pennycress DR",
+                              "cr_1" = "Cereal Rye SA", "cr_2" = "Cereal Rye DR",
+                              "ar_1" = "Annual Rye SA", "ar_2" = "Annual Rye DR")) +
   scale_shape_manual(name = "Species",
-                     label = c("pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
-                               "cr_1", "cr_2", "ar_1", "ar_2"),
-                     values = c(15, 16, 17, 18)) +
+                     label = c("Pennycress SA", "Pennycress DR", "GE Pennycress SA",
+                               "GE Pennycress DR", "Cereal Rye SA", "Cereal Rye DR",
+                               "Annual Rye SA", "Annual Rye DR"),
+                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
 
