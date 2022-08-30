@@ -130,7 +130,7 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
                                "GE Pennycress DR", "Cereal Rye SA", "Cereal Rye DR",
                                "Annual Rye SA", "Annual Rye DR"),
                      values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
-  expand_limits(ymin = 0.005, ymax = 0.02) +
+  expand_limits(ymin = 0.005, ymax = 0.015) +
   theme_classic()
 
 nitrogen_emm.plot
