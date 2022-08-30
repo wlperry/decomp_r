@@ -686,7 +686,7 @@ Anova(one.lm, type = 3)
 # from results of anova, going to use emmeans to find differences between groups of spp
 
 # create emmeans model ----
-one.emm <- emmeans(one.lm, ~ spp)
+one.emm <- emmeans(one.lm, ~ spp * soil_block)
 
 # plot emmeans ----
 plot(one.emm, comparisons = TRUE)
@@ -696,7 +696,8 @@ plot(one.emm, comparisons = TRUE)
 multcomp::cld(one.emm, Letters = letters, adjust = "Bonferroni")
 
 # p-values ----
-emminteraction = emmeans(one.emm, pairwise ~ spp, adjust = "bonferroni", alpha = 0.5)
+emminteraction = emmeans(one.emm, pairwise ~ spp *soil_block, 
+                         adjust = "bonferroni", alpha = 0.5)
 emminteraction$contrasts
 
 
@@ -807,6 +808,8 @@ k_average.df <- nonlin_n_k.df %>%
 
 # SAVE FILES FOR OUTPUT AND PLOTTING ----
 write_csv(emmeans.df, file = "output/final/nitrogen_k_emmeans.csv")
+
+citation("emmeans")
 
 
 

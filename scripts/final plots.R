@@ -33,94 +33,121 @@ full.df <- full.df %>%
   rename(pct_c_remain = pct_c_remaing)
 
 biomass_k_emmeans.df <- biomass_k_emmeans.df %>%
-  mutate(sp = as.character(sp))
+  mutate(spp = as.factor(sp)) 
+
+nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
+  mutate(soil_block = as.factor(soil_block))
+  
 
 
 
-# PERCENT REMAINING ----
+# FIGURES ----
 
-# biomass ----
+# BIOMASS ----
+
+# percent remaining
 decomp.plot <- decomp.df %>%
   ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp)) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   labs(x = "Days After Placement", y = "Mean Percent Biomass Remaining") +
-  scale_shape_manual(name = "spp", 
-                     label = c("Annual Rye", "Cereal Rye", "AOP2 Pennycress", "Pennycress"),
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(y = 25) +
   theme_classic()
 
 decomp.plot
 
-# nitrogen ----
+# emmeans 
+decomp_emm.plot <- biomass_k_emmeans.df %>% 
+  ggplot(aes(x = factor(spp, level = c("pc", "gm_pc", "cr", "ar")))) +
+  geom_point(aes(y=emmean, shape = spp), size = 3) +
+  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
+                stat="identity", width = 0.2) +
+  labs(x="Species", y= "k (% biomass lost per day)")  +
+  geom_text(aes(x = 1, y = 0.013, label = "A")) +
+  geom_text(aes(x = 2, y = 0.013, label = "A")) +
+  geom_text(aes(x = 3, y = 0.013, label = "B"))+
+  geom_text(aes(x = 4, y = 0.013, label = "B")) +
+  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
+                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+                     values = c(15, 16, 17, 18)) +
+  expand_limits(ymin = 0.005, ymax = 0.015) +
+  theme_classic()
+
+decomp_emm.plot
+
+# full
+decomp.plot + decomp_emm.plot + plot_layout(ncol = 1, guides = "collect")
+
+
+# NITROGEN ----
+
+# mass remaining 
 nitrogen.plot <- full.df %>%
   ggplot(mapping = aes(days, pct_n_remain, shape = spp)) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   labs(x = "Days After Placement", y = "Mean Percent Nitrogen Remaining") +
-  scale_shape_manual(name = "spp", 
-                     label = c("Annual Rye", "Cereal Rye", "AOP2 Pennycress", "Pennycress"),
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(y = 25) +
   theme_classic()
 
 nitrogen.plot
 
-# carbon ----
+# emmeans 
+nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
+  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
+  ggplot(aes(x=spp)) +
+  geom_point(aes(y=emmean, shape = spp), 
+             position = position_dodge2(width = 0.3), size = 3) +
+  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
+                position = position_dodge2(0.3),
+                stat="identity", width = 0.3) + 
+  labs(x="Species", y= "k (% nitrogen loss per day)")  +
+  geom_text(aes(x = 1, y = .02, label = "AB")) +
+  geom_text(aes(x = 2, y = .02, label = "A")) +
+  geom_text(aes(x = 3, y = .02, label = "B"))+
+  geom_text(aes(x = 4, y = .02, label = "C")) +
+  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
+                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+                     values = c(15, 16, 17, 18)) +
+  expand_limits(ymin = 0.005, ymax = 0.02) +
+  theme_classic()
+
+nitrogen_emm.plot
+
+nitrogen_k_emmeans.df %>%
+  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
+  ggplot(aes(x = spp)) +
+  geom_point(aes(y = emmean, shape = spp), position = position_dodge2(0.9)) +
+  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), stat = "identity", 
+                position = position_dodge2())
+
+# CARBON ----
+
+# mass remaining 
 carbon.plot <- full.df %>%
   ggplot(mapping = aes(days, pct_c_remain, shape = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   labs(x = "Days After Placement", y = "Mean Percent Carbon Remaining") +
   scale_shape_manual(name = "spp", 
-                     label = c("Annual Rye", "Cereal Rye", "AOP2 Pennycress", "Pennycress"),
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(y = 25) +
   theme_classic()
 
 carbon.plot 
 
-# EMMEANS ----
-  
-# biomass ----
-decomp_emm.plot <- biomass_k_emmeans.df %>% 
-  ggplot(aes(x = factor(sp, level = c("pc", "gm_pc", "cr", "ar")))) +
-  geom_point(aes(y=emmean), size=3) +
-  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
-                stat="identity", width = 0.2) +
-  labs(x="Species", y= "k (% biomass lost per day)")  +
-  geom_text(aes(x = 1, y = 0.02, label = "A")) +
-  geom_text(aes(x = 2, y = 0.02, label = "A")) +
-  geom_text(aes(x = 3, y = 0.02, label = "B"))+
-  geom_text(aes(x = 4, y = 0.02, label = "B")) +
-  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "AOP2 Pennycress",
-                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
-  expand_limits(ymin = 0.005, ymax = 0.02) +
-  theme_classic()
-
-decomp_emm.plot
-
-# nitrogen ----
-nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
-  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
-  ggplot(aes(x=spp)) +
-  geom_point(aes(y=emmean), size=3) +
-  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
-                stat="identity", width = 0.2) +
-  labs(x="Species", y= "k (% nitrogen loss per day)")  +
-  geom_text(aes(x = 1, y = .02, label = "AB")) +
-  geom_text(aes(x = 2, y = .02, label = "A")) +
-  geom_text(aes(x = 3, y = .02, label = "B"))+
-  geom_text(aes(x = 4, y = .02, label = "C")) +
-  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "AOP2 Pennycress",
-                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
-  expand_limits(ymin = 0.005, ymax = 0.02) +
-  theme_classic()
-
-nitrogen_emm.plot
-
-# carbon ----
+# emmeans 
 carbon_emm.plot <- carbon_k_emmeans.df %>%
   mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
   ggplot(aes(x=spp)) +
@@ -132,17 +159,19 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
   geom_text(aes(x = 2, y = .02, label = "B")) +
   geom_text(aes(x = 3, y = .02, label = "C"))+
   geom_text(aes(x = 4, y = .02, label = "D")) +
-  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "AOP2 Pennycress",
+  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
 
 carbon_emm.plot
 
+
 # put them all together
 decomp.plot + nitrogen.plot + carbon.plot +
 decomp_emm.plot + nitrogen_emm.plot + carbon_emm.plot +
 plot_layout(ncol = 3, guides = "collect")
+
 
 
 

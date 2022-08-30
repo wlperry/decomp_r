@@ -695,6 +695,7 @@ plot(k_nonlin.emm, comparisons = TRUE)
 # Mean separation
 multcomp::cld(k_nonlin.emm, Letters = letters, adjust="bonferroni")
 
+
 # Now to obtain the emmeans
 # pairwise
 anova_emminteraction = emmeans(k_nonlin.model, 
@@ -702,6 +703,11 @@ anova_emminteraction = emmeans(k_nonlin.model,
                                adjust = "bonferroni")
 
 anova_emminteraction$emmeans
+
+# want the p-values 
+anova_emminteraction$contrasts
+
+
 
 k_nonlin.emmeans <- as.data.frame(anova_emminteraction$emmeans)
 
