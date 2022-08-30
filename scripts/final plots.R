@@ -37,6 +37,9 @@ biomass_k_emmeans.df <- biomass_k_emmeans.df %>%
 
 nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
   mutate(soil_block = as.factor(soil_block))
+
+nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
+  mutate(spp_soil = paste(spp, soil_block, sep = "_"))
   
 
 
@@ -102,8 +105,9 @@ nitrogen.plot
 
 # emmeans 
 nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
-  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
-  ggplot(aes(x=spp)) +
+  mutate(spp = fct_relevel(spp_soil, "pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
+                           "cr_1", "cr_2", "ar_1", "ar_2")) %>%
+  ggplot(aes(x=spp_soil)) +
   geom_point(aes(y=emmean, shape = spp), 
              position = position_dodge2(width = 0.3), size = 3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
@@ -114,10 +118,11 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_text(aes(x = 2, y = .02, label = "A")) +
   geom_text(aes(x = 3, y = .02, label = "B"))+
   geom_text(aes(x = 4, y = .02, label = "C")) +
-  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
+  scale_x_discrete(labels = c("pc_1" = "Pennycress 721A", "pc_2" = "Pennycress 145B2" "gm_pc"= "GE Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
-  scale_shape_manual(name = "Species", 
-                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+  scale_shape_manual(name = "Species",
+                     label = c("pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
+                               "cr_1", "cr_2", "ar_1", "ar_2"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
