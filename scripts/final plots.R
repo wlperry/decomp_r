@@ -40,7 +40,7 @@ nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
 
 nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
   mutate(spp_soil = paste(spp, soil_block, sep = "_"))
-  
+
 
 
 
@@ -104,9 +104,7 @@ nitrogen.plot <- full.df %>%
 nitrogen.plot
 
 # emmeans 
-pd <- position_dodge2(2)
 nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
-<<<<<<< Updated upstream
   mutate(spp = fct_relevel(spp_soil, "pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
                            "cr_1", "cr_2", "ar_1", "ar_2")) %>%
   ggplot(aes(x=spp_soil)) +
@@ -115,14 +113,6 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 position = position_dodge2(0.3),
                 stat="identity", width = 0.3) + 
-=======
-  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
-  ggplot(aes(x=spp, y=emmean, shape = spp, group=spp)) +
-  geom_point(position = pd, size = 1) +
-  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), width = 0.3, 
-                position = pd,
-                stat="identity") + 
->>>>>>> Stashed changes
   labs(x="Species", y= "k (% nitrogen loss per day)")  +
   geom_text(aes(x = 1, y = .02, label = "AB")) +
   geom_text(aes(x = 2, y = .02, label = "A")) +
@@ -131,12 +121,8 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   scale_x_discrete(labels = c("pc_1" = "Pennycress 721A", "pc_2" = "Pennycress 145B2" "gm_pc"= "GE Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Species",
-<<<<<<< Updated upstream
                      label = c("pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
                                "cr_1", "cr_2", "ar_1", "ar_2"),
-=======
-                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
->>>>>>> Stashed changes
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
@@ -188,8 +174,8 @@ carbon_emm.plot
 
 # put them all together
 decomp.plot + nitrogen.plot + carbon.plot +
-decomp_emm.plot + nitrogen_emm.plot + carbon_emm.plot +
-plot_layout(ncol = 3, guides = "collect")
+  decomp_emm.plot + nitrogen_emm.plot + carbon_emm.plot +
+  plot_layout(ncol = 3, guides = "collect")
 
 
 
