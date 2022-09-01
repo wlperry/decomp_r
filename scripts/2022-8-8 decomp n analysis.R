@@ -7,6 +7,7 @@ library(car)
 library(emmeans)
 library(patchwork)
 library(multcompView)
+library(lsmeans)
 
 # READ IN THE DATA ----
 
@@ -700,6 +701,81 @@ emminteraction = emmeans(one.emm, pairwise ~ spp *soil_block,
                          adjust = "bonferroni", alpha = 0.5)
 emminteraction$contrasts
 
+# CONTRASTS LSMEANS ----
+# because we have a signifiant interaction between soil and species, we need to 
+# use planned contrasts to determine differences between groups
+
+# have to put spp and soil block together for this
+nonlin_n_k.df <- nonlin_n_k.df %>%
+  mutate(spp = as.factor(spp),
+         soil_block = as.factor(soil_block))
+
+nonlin_n_k.df <- nonlin_n_k.df %>%
+  mutate(trt = paste(spp, soil_block, sep = "_"))
+
+nonlin_n_k.df <- nonlin_n_k.df %>%
+  mutate(trt = as.factor(trt))
+
+# set up to run contrasts
+options(contrasts = c("contr.sum", "contr.poly"))
+
+# contrast model ----
+contrast_model.lm = lm(k ~ trt, data = nonlin_n_k.df)
+
+# least squares
+leastsquare = lsmeans(contrast_model.lm, "trt")
+
+# need the levels
+levels(nonlin_n_k.df$trt)
+
+# contrasts
+Contrasts = list(ar1_ar2 = c(1, -1, 0, 0, 0, 0, 0, 0),
+                 cr1_cr2 = c(0, 0, 1, -1, 0, 0, 0, 0),
+                 gm1_gm_2 = c(0, 0, 0, 0, 1, -1, 0, 0),
+                 pc1_pc2 = c(0, 0, 0, 0, 0, 0, 1, -1),
+                 ar1_cr1 = c(1, 0, -1, 0, 0, 0, 0, 0),
+                 ar2_cr2 = c(0, 1, 0, -1, 0, 0, 0, 0),
+                 ar1_pc1 = c(1, 0, 0, 0, 0, 0, -1, 0),
+                 ar2_pc2 = c(0, 1, 0, 0, 0, 0, 0, -1),
+                 ar1_gm1 = c(1, 0, 0, 0, -1, 0, 0, 0),
+                 ar2_gm2 = c(0, 1, 0, 0, 0, -1, 0, 0),
+                 cr1_pc1 = c(0, 0, 1, 0, 0, 0, -1, 0),
+                 cr2_pc2 = c(0, 0, 0, 1, 0, 0, 0, -1),
+                 cr1_gm1 = c(0, 0, 1, 0, -1, 0, 0, 0),
+                 cr2_gm2 = c(0, 0, 0, 1, 0, -1, 0, 0),
+                 pc1_gm1 = c(0, 0, 0, 0, 1, 0, -1, 0),
+                 pc2_gm2 = c(0, 0, 0, 0, 0, 1, 0, -1))
+
+# run test and save as data frame
+n_contrast.df <- as.data.frame(contrast(leastsquare, Contrasts, adjust = "sidak"))
+
+# EMMEANS ON TRT ----
+# create emmeans model ----
+two.emm <- emmeans(contrast_model.lm, ~ trt)
+
+# plot emmeans ----
+plot(two.emm, comparisons = TRUE)
+
+# mean separation ----
+# where are the differences in groups and what are the emmeans?
+multcomp::cld(two.emm, Letters = letters, adjust = "Bonferroni")
+
+# p-values ----
+emminteraction = emmeans(two.emm, pairwise ~ trt, 
+                         adjust = "bonferroni", alpha = 0.5)
+emminteraction$contrasts
+
+# save as data frame
+emmeans_contrasts.df <- 
+  as.data.frame(multcomp::cld(two.emm, Letters = letters, adjust = "Bonferroni"))
+emmeans_contrasts.df
+
+# plot contrasts
+emmeans_contrasts.df %>%
+  ggplot(aes(x = trt)) +
+  geom_point(aes(y = emmean)) +
+  geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), stat = "identity", width = 0.2) +
+  theme_classic()
 
 
 # FINAL PLOTS ----
@@ -710,8 +786,7 @@ emmeans.df
 
 # relevel factors ----
 emmeans.df <- emmeans.df %>%
-  mutate(spp = as.factor(spp)) 
-
+  mutate(spp = as.factor(spp))
 
 # final plot ----
 emmeans.df %>%
@@ -807,7 +882,11 @@ k_average.df <- nonlin_n_k.df %>%
             sd = sd(k)) 
 
 # SAVE FILES FOR OUTPUT AND PLOTTING ----
+# emmeans
 write_csv(emmeans.df, file = "output/final/nitrogen_k_emmeans.csv")
+
+# contrasts
+write_csv(emmeans_contrasts.df, file = "output/final/nitrogen_k_emmcontrasts.csv")
 
 citation("emmeans")
 
