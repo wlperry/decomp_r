@@ -25,6 +25,9 @@ biomass_k_emmeans.df <- read_csv("output/final/biomass_k_emmeans.csv")
 # nitrogen ----
 nitrogen_k_emmeans.df <- read_csv("output/final/nitrogen_k_emmeans.csv")
 
+# nitrogen contrasts ----
+nitrogen_k_contrasts.df <- read_csv("output/final/nitrogen_k_emmcontrasts.csv")
+
 # carbon ----
 carbon_k_emmeans.df <- read_csv("output/final/carbon_k_emmeans.csv")
 
@@ -40,9 +43,6 @@ nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
 
 nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
   mutate(spp_soil = paste(spp, soil_block, sep = "_"))
-
-
-
 
 # FIGURES ----
 
@@ -164,12 +164,35 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
 
 nitrogen_emm.plot
 
-nitrogen_k_emmeans.df %>%
-  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
-  ggplot(aes(x = spp)) +
-  geom_point(aes(y = emmean, shape = spp), position = position_dodge2(0.9)) +
-  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), stat = "identity", 
-                position = position_dodge2())
+# contrast emmeans
+nitrogen_contrasts.plot <- nitrogen_k_contrasts.df %>%
+  ggplot(aes(x = trt)) +
+  geom_point(aes(y = emmean, shape = trt), size = 3) +
+  geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = 0.3) +
+  geom_text(aes(x = 1, y = .015, label = "CD")) +
+  geom_text(aes(x = 2, y = .015, label = "D")) +
+  geom_text(aes(x = 3, y = .015, label = "AB"))+
+  geom_text(aes(x = 4, y = .015, label = "BCD")) +
+  geom_text(aes(x = 5, y = .015, label = "A")) +
+  geom_text(aes(x = 6, y = .015, label = "A")) +
+  geom_text(aes(x = 7, y = .015, label = "ABC"))+
+  geom_text(aes(x = 8, y = .015, label = "AB")) +
+  scale_x_discrete(labels = c("Annual Rye SA", "Annual Rye DR", "Cereal Rye SA",
+                              "Cereal Rye DR", "LG Pennycress SA", "LG Pennycress DR",
+                              "WT Pennycress SA", "WT Pennycress DR")) +
+  scale_shape_manual(name = "Species",
+                     label = c("Annual Rye SA", "Annual Rye DR", "Cereal Rye SA",
+                               "Cereal Rye DR", "LG Pennycress SA", "LG Pennycress DR",
+                               "WT Pennycress SA", "WT Pennycress DR"),
+                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
+  labs(x = "Species and Soil Tye", y = "K (nitrogen loss per day)") +
+  theme_classic() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
+
+nitrogen_contrasts.plot
+
+# comparing emmeans
+nitrogen_emm.plot + nitrogen_contrasts.plot
 
 # CARBON ----
 
