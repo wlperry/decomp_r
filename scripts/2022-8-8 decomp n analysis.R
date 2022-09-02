@@ -36,6 +36,9 @@ n_data.df <- n_data.df %>%
 # full join 
 full.df <- full_join(decomp.df, n_data.df, by = "sample")
 
+# remove old dataframes
+rm(decomp.df, n_data.df)
+
 # CLEAN FULL DATAFRAME ----
 
 # remove na from data we didn't send 
@@ -104,9 +107,10 @@ full.df <- full.df %>%
 
 # graph it to see how it looks
 full.df %>%
-  ggplot(mapping = aes(days, pct_n_remain, color = spp)) +
+  ggplot(mapping = aes(log(days+1), log(pct_n_remain), color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_smooth(method="lm", se=F)
   theme_classic()
 
 # NONLINEAR MODELS ----
@@ -225,7 +229,7 @@ plot(s1$t,pred[,3],xlab="Days",ylab="Predictions")
 #add observed measurements to plot as points
 points(s1$t,obs[,1],col="red") 
 #points command explanation:
-#points(x data, ydata, point color = red)
+#points(x data, y data, point color = red)
 
 
 write_csv(as.data.frame(k), file="output/pc_n_k nonlin values.csv")
