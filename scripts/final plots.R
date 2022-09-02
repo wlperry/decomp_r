@@ -118,7 +118,7 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_text(aes(x = 2, y = .02, label = "A")) +
   geom_text(aes(x = 3, y = .02, label = "B"))+
   geom_text(aes(x = 4, y = .02, label = "C")) +
-  scale_x_discrete(labels = c("pc_1" = "Pennycress 721A", "pc_2" = "Pennycress 145B2" "gm_pc"= "GE Pennycress",
+  scale_x_discrete(labels = c("pc_1" = "Pennycress 721A", "pc_2" = "Pennycress 145B2", "gm_pc"= "GE Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Species",
                      label = c("pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
