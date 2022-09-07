@@ -162,3 +162,111 @@ theme_classic()
 
 # save as csv
 write_csv(full.df, file = "data/cleaned/clean nitrogen.csv")
+
+
+# CARBON ----
+
+# READ IN THE DATA 
+
+# decomp
+decomp.df <- read_csv("data/decomp_biomass.csv") %>% clean_names()
+
+# n data 
+n_data.df <- read.csv("Data/Decomp/n with data.csv") %>%
+  clean_names() %>%
+  remove_empty(which = c("cols", "rows"))
+
+
+# CLEAN DATA TO JOIN 
+
+# rename and make factors
+decomp.df <- decomp.df %>%
+  rename(sample = bag_no) %>%
+  mutate(sample = as.factor(sample))
+
+# make factor
+n_data.df <- n_data.df %>%
+  mutate(sample = as.factor(sample))
+
+# JOIN FILES 
+
+# full join 
+carbon.df <- full_join(decomp.df, n_data.df, by = "sample")
+
+# CLEAN FULL DATAFRAME 
+
+# remove na from data we didn't send 
+carbon.df <- carbon.df %>%
+  na.omit()
+
+# make row a number
+carbon.df <- carbon.df %>% 
+  mutate(row = case_when(
+    row == "A" ~ 1,
+    row == "B" ~ 2,
+    row == "C" ~ 3,
+    row == "D" ~ 4,
+    row == "E" ~ 5,
+    row == "F" ~ 6,
+    row == "G" ~ 7,
+    row == "H" ~ 8,
+    row == "I" ~ 9,
+    row == "J" ~ 10,
+    TRUE ~ 99999
+  ) )
+
+# C IN BIOMASS 
+
+# first need day 0 porportion of n * initial wt for how much n in initial weight
+# calculate proportion n 
+carbon.df <- carbon.df %>% 
+  mutate(prop_c = percent_c / 100)
+
+# now we need day 0 and by species 
+initial_prop_c.df <- carbon.df %>%
+  filter(days == 0) %>%
+  group_by(spp) %>%
+  summarize(initial_prop_c = mean(prop_c))
+
+# we then multiply each sample by the initial prop n to get the initial n for every sample
+carbon.df <- carbon.df %>%
+  mutate(initial_prop_c = case_when(
+    spp == "PC" ~ initial_wt_g * 0.4549000,
+    spp == "GM_PC" ~ initial_wt_g * 0.4313636,
+    spp == "AR" ~ initial_wt_g * 0.4131000,
+    spp == "CR" ~ initial_wt_g * 0.4298000
+  ))
+
+# now we take collected weight and multiply by the collected prop n to get collected n
+carbon.df <- carbon.df %>%
+  mutate(collected_prop_c = coll_wt_g * prop_c)
+
+# finally divide initial by collected to get prop n remaining then * 100 for pct
+carbon.df <- carbon.df %>%
+  mutate(prop_c_remain = collected_prop_c / initial_prop_c) %>%
+  mutate(pct_c_remaing = prop_c_remain * 100)
+
+# graph it to see how it looks
+carbon.df %>%
+  ggplot(mapping = aes(days, pct_c_remaing, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
+
+# gonna have to get rid of those weird days that got sampled
+unique(carbon.df$days)
+
+carbon.df <- carbon.df %>%
+  filter(days == 0 | days == 14 | days == 35 | days == 63)
+
+# plot it again to see if I removed the correct days, yep looks good
+carbon.df %>%
+  ggplot(mapping = aes(days, pct_c_remaing, color = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  theme_classic()
+
+# save as csc
+write_csv(carbon.df, file = "data/cleaned/clean carbon.csv")
+
+
