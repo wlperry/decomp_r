@@ -113,6 +113,21 @@ full.df %>%
   geom_smooth(method="lm", se=F)
   theme_classic()
 
+# LIBRARIES ----
+library(tidyverse)
+library(janitor)
+library(purrr)
+library(broom)
+library(car)
+library(emmeans)
+library(patchwork)
+library(multcompView)
+library(lsmeans)
+  
+# READ IN THE DATA ----
+full.df <- read_csv("data/cleaned/clean nitrogen.csv")
+
+
 # NONLINEAR MODELS ----
 
 # pc ----
