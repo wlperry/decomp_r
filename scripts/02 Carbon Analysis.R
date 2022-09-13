@@ -785,6 +785,13 @@ full.df %>%
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
 
+# some averages ----
+average.df <- full.df %>%
+  group_by(spp, days) %>%
+  filter(days == 63) %>%
+  summarize(remain = mean(pct_c_remaing),
+            sd = sd(pct_c_remaing))
+
 # SAVE FILES FOR OUTPUT AND PLOTTING ----
 
 # emmeans for carbon data ----

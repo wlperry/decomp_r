@@ -49,6 +49,11 @@ decomp.df <- decomp.df %>%
     TRUE ~ pct_mass_remain
   ))
 
+# need to know all of the sampling dates
+unique(decomp.df$days)
+#  0  7 14 21 28 35 49 63 84 NA
+
+
 
 # save as csv
 write_csv(decomp.df, file = "data/cleaned/clean total biomass.csv")

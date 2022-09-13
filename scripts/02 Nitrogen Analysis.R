@@ -895,9 +895,17 @@ total_c.plot + prop_c.plot + plot_layout(ncol = 1, guides = "collect")
 
 # some averages ----
 k_average.df <- nonlin_n_k.df %>%
-  group_by(sp) %>%
+  group_by(spp) %>%
   summarize(avg = mean(k),
             sd = sd(k)) 
+
+# of biomass
+
+average.df <- full.df %>%
+  group_by(spp, days) %>%
+  filter(days == 63) %>%
+  summarize(remain = mean(pct_n_remain),
+            sd = sd(pct_n_remain))
 
 # SAVE FILES FOR OUTPUT AND PLOTTING ----
 # emmeans

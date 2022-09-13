@@ -68,7 +68,7 @@ decomp_emm.plot <- biomass_k_emmeans.df %>%
   geom_point(aes(y=emmean, shape = spp), size = 3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
-  labs(x="Species", y= "k (% biomass lost per day)")  +
+  labs(x="Species", y= "k (biomass lost per day)")  +
   geom_text(aes(x = 1, y = 0.013, label = "A")) +
   geom_text(aes(x = 2, y = 0.013, label = "A")) +
   geom_text(aes(x = 3, y = 0.013, label = "B"))+
@@ -114,7 +114,7 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE, group = soil_block), 
                 position = position_dodge2(0.3),
                 stat="identity", width = 0.3) + 
-  labs(x="Species", y= "k (% nitrogen loss per day)")  +
+  labs(x="Species", y= "k (nitrogen loss per day)")  +
   geom_text(aes(x = 0.9, y = .010, label = "ABC")) +
   geom_text(aes(x = 1.1, y = .008, label = "AB")) +
   geom_text(aes(x = 1.9, y = .007, label = "A")) +
@@ -145,7 +145,7 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 position = position_dodge2(0.3),
                 stat="identity", width = 0.3) + 
-  labs(x="Species", y= "k (% nitrogen loss per day)")  +
+  labs(x="Species", y= "k (nitrogen loss per day)")  +
   geom_text(aes(x = 1, y = .02, label = "AB")) +
   geom_text(aes(x = 2, y = .02, label = "A")) +
   geom_text(aes(x = 3, y = .02, label = "B"))+
@@ -202,7 +202,7 @@ carbon.plot <- full.df %>%
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   labs(x = "Days After Placement", y = "Mean Percent Carbon Remaining") +
-  scale_shape_manual(name = "spp", 
+  scale_shape_manual(name = "Species", 
                      label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(y = 25) +
@@ -217,13 +217,16 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
   geom_point(aes(y=emmean), size=3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
-  labs(x="Species", y= "k (% carbon loss per day)")  +
+  labs(x="Species", y= "k (carbon loss per day)")  +
   geom_text(aes(x = 1, y = .02, label = "A")) +
   geom_text(aes(x = 2, y = .02, label = "B")) +
   geom_text(aes(x = 3, y = .02, label = "C"))+
   geom_text(aes(x = 4, y = .02, label = "D")) +
   scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+                     values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
 
@@ -235,8 +238,27 @@ decomp.plot + nitrogen.plot + carbon.plot +
   decomp_emm.plot + nitrogen_emm.plot + carbon_emm.plot +
   plot_layout(ncol = 3, guides = "collect")
 
+# PUT THE PLOTS TOGETHER FOR THE PAPER ----
 
+# plan here for the paper is to have 3 plots, one for total biomass, one for
+# n and one for c
 
+# full biomass ----
+full_biomass.plot <- decomp.plot + decomp_emm.plot + 
+  plot_layout(guides = "collect", ncol = 1)
 
+full_biomass.plot
+
+# full nitrogen ----
+full_nitrogen.plot <- nitrogen.plot + nitrogen_contrasts.plot +
+  plot_layout(guides = "collect", ncol = 1)
+
+full_nitrogen.plot
+
+# full carbon ----
+full_carbon.plot <- carbon.plot + carbon_emm.plot +
+  plot_layout(guides = "collect", ncol = 1)
+
+full_carbon.plot
 
 
