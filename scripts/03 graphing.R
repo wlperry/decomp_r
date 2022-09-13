@@ -3,12 +3,23 @@ library(tidyverse)
 library(patchwork)
 
 # OBJECTIVE ----
-# I'm going to use this file for all of the final plotting I need to do so that I can do it all in one place.
-# At the end of the biomass, nitrogen, and carbon analysis scripts I saved the relevant files as csv files
-# in the filepath: "output/final". The full data frame for the nitrogen and carbon loss data is created and 
-# saved in the carbon analysis file so that I only had to do it once and put it in one place. 
-# going to start by plotting the percent remaining over time, and them the emmeans graphs with relevant
+# I'm going to use this file for all of the final plotting
+# I need to do so that I can do it all in one place.
+# At the end of the biomass, nitrogen, and carbon analysis scripts
+#I saved the relevant files as csv files
+# in the filepath: "output/final". The full data frame for
+# the nitrogen and carbon loss data is created and 
+# saved in the carbon analysis file so that I only had to do it 
+# once and put it in one place. 
+# going to start by plotting the percent remaining over time, 
+# and them the emmeans graphs with relevant
 # statistics. Will see where to go from there. 
+
+# STUFF TO DO HERE ----
+# 2022-09-13 
+# - make the things on the legend match the mass remaining
+# - change y axes to % mass reamining 
+# - use a regression line with no se rather than a line that follows the points 
 
 # READ IN THE DATA ----
 
@@ -30,6 +41,14 @@ nitrogen_k_contrasts.df <- read_csv("output/final/nitrogen_k_emmcontrasts.csv")
 
 # carbon ----
 carbon_k_emmeans.df <- read_csv("output/final/carbon_k_emmeans.csv")
+
+# carbon to nitrogen ratios ----
+ratios.df <- read_csv("output/final/c to n ratios.csv")
+
+# carbon to nitrogen ratios by soil ----
+ratio_soils.df <- read_csv("output/final/ c to n ratios by soil.csv")
+
+
 
 # CLEANING OF FILES ----
 full.df <- full.df %>%
@@ -260,5 +279,50 @@ full_carbon.plot <- carbon.plot + carbon_emm.plot +
   plot_layout(guides = "collect", ncol = 1)
 
 full_carbon.plot
+
+# CARBON TO NITROGEN RATIOS PLOTTING ----
+
+# by species ----
+ratio.plot <- ratios.df %>%
+  ggplot(mapping = aes(days, mean, shape = spp)) +
+  geom_point(size = 3) +
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "LG Pennycress", " WT Pennycress"),
+                     values = c(15, 16, 17, 18)) +
+  labs(x = "Days After Bag Placement", y = "Carbon to Nitrogen Ratio") +
+  theme_classic()
+
+# by species and soil ----
+ratio_soils.plot <- ratio_soils.df %>%
+  ggplot(mapping = aes(days, mean, shape = spp_soil)) +
+  geom_point(size = 3) +
+  scale_shape_manual(name = "Species",
+                     label = c("Annual Rye SA", "Annual Rye DR", "Cereal Rye SA",
+                               "Cereal Rye DR", "LG Pennycress SA", "LG Pennycress DR",
+                               "WT Pennycress SA", "WT Pennycress DR"),
+                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
+  labs(x = "Days After Bag Placement", y = "Carbon to Nitrogen Ratio") +
+  theme_classic()
+
+# putting the above two plots together
+ratio.plot + ratio_soils.plot + plot_layout(ncol = 1)
+
+# just looking at initial carbon to nitrogen ratio by species
+ratios.df %>%
+  filter(days == 0) %>%
+  ggplot(mapping = aes(spp, mean, shape = spp)) +
+  geom_point(size = 3) +
+  scale_shape_manual(name = "Species", 
+                     label = c("Annual Rye", "Cereal Rye", "LG Pennycress", " WT Pennycress"),
+                     values = c(15, 16, 17, 18)) +
+  labs(x = "Species", y = "Initial Carbon to Nitrogen Ratio") +
+  theme_classic()
+  
+
+
+
+
+
+
 
 
