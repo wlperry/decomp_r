@@ -61,7 +61,7 @@ nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
   mutate(soil_block = as.factor(soil_block))
 
 nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
-  mutate(spp_soil = paste(spp, soil_block, sep = "_"))
+  mutate(spp_soil = paste(spp, soil_block, sep = "_")) 
 
 # FIGURES ----
 
@@ -69,14 +69,20 @@ nitrogen_k_emmeans.df <- nitrogen_k_emmeans.df %>%
 
 # percent remaining
 decomp.plot <- decomp.df %>%
-  ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp)) +
+  ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp, linetype = spp)) + 
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-  labs(x = "Days After Placement", y = "Mean Percent Biomass Remaining") +
-  scale_shape_manual(name = "Species", 
-                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  labs(x = "Days After Placement", y = "% Biomass Remaining") +
+  scale_shape_manual(name = "Species",
+                     label = c("Annual Rye", "Cereal Rye", "LG Pennycress", " WT Pennycress"),
                      values = c(15, 16, 17, 18)) +
-  expand_limits(y = 25) +
+  scale_linetype_manual(name = "Species",
+                        label = 
+                          c("Annual Rye", "Cereal Rye", "LG Pennycress", " WT Pennycress"),
+                        values = c(1, 2, 3, 5)) +
+  labs(shape = "Species", linetype = "Species") +
+  expand_limits(y = 45) +
   theme_classic()
 
 decomp.plot
