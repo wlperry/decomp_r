@@ -150,6 +150,29 @@ for(i in 1:max(pc$rep)){
   
 }	#end of nls ?for? loop
 
+# convert observed and predicted to dataframes
+pc_obs.df <- as.data.frame(obs) %>% 
+  mutate(sp="pc",
+         data = "observed") %>% 
+  tibble::rownames_to_column( "time") 
+  
+
+pc_pred.df <- as.data.frame(pred) %>% 
+  mutate(sp="pc",
+         data = "predicted") %>% 
+  tibble::rownames_to_column( "time") 
+
+pc_out.df <- bind_rows(pc_obs.df, pc_pred.df)
+
+pc_out_long.df <- pc_out.df %>% 
+  pivot_longer(cols = -c("time", "sp", "data"),
+               names_to = "column",
+               values_to = "pct_remain")
+
+pc_out_long.df %>% 
+  ggplot(aes(x=time, y=pct_remain, color=data))+
+  geom_point(position=position_dodge2(width=0.2))
+
 # #copy vector with k values to clipboard to paste into excel or 
 # #	other program of choice. This command raises clipboard 
 # #	memory in 32 KB steps; default = 32 KB
@@ -637,9 +660,10 @@ decomp.df %>%
               formula = pct_mass_remain_corr ~ 1 * exp(-k*days),
               method.args = list(start = c(k=.01, days=0, pct_mass_remain_corr=100)),  #
               se = FALSE)+
-  theme_classic()
-
+  theme_classic() 
   
+
+
   # Mt ~ 1 * exp(-k*t), trace=TRUE, start = list(k = .01)
 
 
