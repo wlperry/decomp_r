@@ -5,6 +5,7 @@ library(purrr)
 library(broom)
 library(car)
 library(emmeans)
+library(patchwork)
 
 # READ IN THE DECOMP DATA ----
 # read in file 
@@ -150,29 +151,6 @@ for(i in 1:max(pc$rep)){
   
 }	#end of nls ?for? loop
 
-# convert observed and predicted to dataframes
-pc_obs.df <- as.data.frame(obs) %>% 
-  mutate(sp="pc",
-         data = "observed") %>% 
-  tibble::rownames_to_column( "time") 
-  
-
-pc_pred.df <- as.data.frame(pred) %>% 
-  mutate(sp="pc",
-         data = "predicted") %>% 
-  tibble::rownames_to_column( "time") 
-
-pc_out.df <- bind_rows(pc_obs.df, pc_pred.df)
-
-pc_out_long.df <- pc_out.df %>% 
-  pivot_longer(cols = -c("time", "sp", "data"),
-               names_to = "column",
-               values_to = "pct_remain")
-
-pc_out_long.df %>% 
-  ggplot(aes(x=time, y=pct_remain, color=data))+
-  geom_point(position=position_dodge2(width=0.2))
-
 # #copy vector with k values to clipboard to paste into excel or 
 # #	other program of choice. This command raises clipboard 
 # #	memory in 32 KB steps; default = 32 KB
@@ -197,10 +175,37 @@ points(s1$t,obs[,1],col="red")
 #points command explanation:
 #points(x data, ydata, point color = red)
 
-
 write_csv(as.data.frame(k), file="output/pc k nonlin values.csv")
 
 pc_k_nonlin.df <- as.data.frame(k)
+
+# convert observed and predicted to dataframes
+pc_obs.df <- as.data.frame(obs) %>% 
+  mutate(sp="pc",
+         data = "observed") %>% 
+  tibble::rownames_to_column( "time") 
+
+
+pc_pred.df <- as.data.frame(pred) %>% 
+  mutate(sp="pc",
+         data = "predicted") %>% 
+  tibble::rownames_to_column( "time") 
+
+# bind data series
+pc_out.df <- bind_rows(pc_obs.df, pc_pred.df)
+
+# convert to long
+pc_out_long.df <- pc_out.df %>% 
+  pivot_longer(cols = -c("time", "sp", "data"),
+               names_to = "column",
+               values_to = "pct_remain")
+
+# graph observed and predcited
+pc_obs_pred.plot <- pc_out_long.df %>% 
+  ggplot(aes(x=time, y=pct_remain, color=data))+
+  geom_point(position=position_dodge2(width=0.2))
+pc_obs_pred.plot
+
 
 # gm ----
 pc_gm <- decomp.df %>% 
@@ -312,6 +317,34 @@ write_csv(as.data.frame(k), file="output/gm_pc k nonlin values.csv")
 
 gm_pc_k_nonlin.df <- as.data.frame(k)
 
+# convert observed and predicted to dataframes
+pc_gm_obs.df <- as.data.frame(obs) %>% 
+  mutate(sp="pc_gm",
+         data = "observed") %>% 
+  tibble::rownames_to_column( "time") 
+
+
+pc_gm_pred.df <- as.data.frame(pred) %>% 
+  mutate(sp="pc",
+         data = "predicted") %>% 
+  tibble::rownames_to_column( "time") 
+
+# bind data series
+pc_gm_out.df <- bind_rows(pc_gm_obs.df, pc_gm_pred.df)
+
+# convert to long
+pc_gm_out_long.df <- pc_gm_out.df %>% 
+  pivot_longer(cols = -c("time", "sp", "data"),
+               names_to = "column",
+               values_to = "pct_remain")
+
+# graph observed and predcited
+pc_gm_obs_pred.plot <-  pc_gm_out_long.df %>% 
+  ggplot(aes(x=time, y=pct_remain, color=data))+
+  geom_point(position=position_dodge2(width=0.2))
+pc_gm_obs_pred.plot 
+
+
 # cr ----
 cr <- decomp.df %>% 
   filter(spp=="CR")  %>% 
@@ -420,6 +453,33 @@ points(s1$t,obs[,1],col="red")
 write_csv(as.data.frame(k), file="output/cr k nonlin values.csv")
 
 cr_k_nonlin.df <- as.data.frame(k)
+
+# convert observed and predicted to dataframes
+cr_obs.df <- as.data.frame(obs) %>% 
+  mutate(sp="cr",
+         data = "observed") %>% 
+  tibble::rownames_to_column( "time") 
+
+
+cr_pred.df <- as.data.frame(pred) %>% 
+  mutate(sp="pc",
+         data = "predicted") %>% 
+  tibble::rownames_to_column( "time") 
+
+# bind data series
+cr_out.df <- bind_rows(cr_obs.df, cr_pred.df)
+
+# convert to long
+cr_out_long.df <- cr_out.df %>% 
+  pivot_longer(cols = -c("time", "sp", "data"),
+               names_to = "column",
+               values_to = "pct_remain")
+
+# graph observed and predcited
+cr_obs_pred.plot <- cr_out_long.df %>% 
+  ggplot(aes(x=time, y=pct_remain, color=data))+
+  geom_point(position=position_dodge2(width=0.2))
+cr_obs_pred.plot 
 
 
 # ar ----
@@ -531,6 +591,37 @@ points(s1$t,obs[,1],col="red")
 write_csv(as.data.frame(k), file="output/ar k nonlin values.csv")
 
 ar_k_nonlin.df <- as.data.frame(k)
+
+# convert observed and predicted to dataframes
+ar_obs.df <- as.data.frame(obs) %>% 
+  mutate(sp="ar",
+         data = "observed") %>% 
+  tibble::rownames_to_column( "time") 
+
+
+ar_pred.df <- as.data.frame(pred) %>% 
+  mutate(sp="pc",
+         data = "predicted") %>% 
+  tibble::rownames_to_column( "time") 
+
+# bind data series
+ar_out.df <- bind_rows(ar_obs.df, ar_pred.df)
+
+# convert to long
+ar_out_long.df <- ar_out.df %>% 
+  pivot_longer(cols = -c("time", "sp", "data"),
+               names_to = "column",
+               values_to = "pct_remain")
+
+# graph observed and predcited
+ar_obs_pred.plot <- ar_out_long.df %>% 
+  ggplot(aes(x=time, y=pct_remain, color=data))+
+  geom_point(position=position_dodge2(width=0.2))
+ar_obs_pred.plot 
+
+pc_obs_pred.plot + pc_gm_obs_pred.plot + cr_obs_pred.plot + ar_obs_pred.plot +
+  plot_annotation(tag_levels = "A", caption = "A pc, B lg_PC, C CR, D AR")
+
 
 # clean files ----
 
