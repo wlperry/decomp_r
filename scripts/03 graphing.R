@@ -87,6 +87,26 @@ decomp.plot <- decomp.df %>%
 
 decomp.plot
 
+test.plot <- decomp.df %>%
+  mutate(spp = as.factor(spp)) %>%
+  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
+  ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp, linetype = spp)) + 
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
+  geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  labs(x = "Days After Placement", y = "% Biomass Remaining") +
+  scale_shape_manual(name = "Species",
+                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+                     values = c(15, 16, 17, 18)) +
+  scale_linetype_manual(name = "Species",
+                        label =
+                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+                        values = c(1, 2, 3, 5)) +
+  labs(shape = "Species", linetype = "Species") +
+  expand_limits(y = 45) +
+  theme_classic()
+
+test.plot
+
 # emmeans 
 decomp_emm.plot <- biomass_k_emmeans.df %>% 
   ggplot(aes(x = factor(spp, level = c("pc", "gm_pc", "cr", "ar")))) +
