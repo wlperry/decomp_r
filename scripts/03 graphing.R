@@ -122,13 +122,18 @@ decomp.plot + decomp_emm.plot + plot_layout(ncol = 1, guides = "collect")
 nitrogen.plot <- full.df %>%
    mutate(spp = as.factor(spp)) %>%
    mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
-  ggplot(mapping = aes(days, pct_n_remain, shape = spp)) +
+  ggplot(mapping = aes(days, pct_n_remain, shape = spp, linetype = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_smooth(se = FALSE, color = "black", size = 0.4) +
   labs(x = "Days After Placement", y = "Mean Percent Nitrogen Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
                      values = c(15, 16, 17, 18)) +
+  scale_linetype_manual(name = "Species",
+                        label =
+                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+                        values = c(1, 2, 3, 5)) +
+  labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
   theme_classic()
 
@@ -139,7 +144,9 @@ nitrogen.plot
 # figure of C:N ratios 
 nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   mutate(spp = fct_relevel(spp, "gm_pc", "pc", "cr", "ar")) %>%
-  mutate()
+  mutate(spp_soil = fct_relevel(spp_soil,
+                               "gm_pc_1", "gm_pc_2", "pc_1", "pc_2", "cr_1", "cr_2",
+                               "ar_1", "ar_2")) %>%
   ggplot(aes(x=spp)) +
   geom_point(aes(y=emmean, shape = spp_soil, group = soil_block), 
              position = position_dodge2(width = 0.3), size = 3) +
@@ -147,10 +154,10 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
                 position = position_dodge2(0.3),
                 stat="identity", width = 0.3) + 
   labs(x="Species", y= "k (nitrogen loss per day)")  +
-  geom_text(aes(x = 0.9, y = .010, label = "ABC")) +
-  geom_text(aes(x = 1.1, y = .008, label = "AB")) +
-  geom_text(aes(x = 1.9, y = .007, label = "A")) +
-  geom_text(aes(x = 2.1, y = .007, label = "A")) +
+  geom_text(aes(x = 0.9, y = .007, label = "A")) +
+  geom_text(aes(x = 1.1, y = .007, label = "A")) +
+  geom_text(aes(x = 1.9, y = .010, label = "ABC")) +
+  geom_text(aes(x = 2.1, y = .008, label = "AB")) +
   geom_text(aes(x = 2.9, y = .009, label = "AB"))+
   geom_text(aes(x = 3.1, y = .011, label = "BCD")) +
   geom_text(aes(x = 3.9, y = .0125, label = "CD"))+
@@ -168,64 +175,9 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
 
 nitrogen_emm.plot
 
-# emmeans with spp and soil on x
-nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
-  mutate(spp = fct_relevel(spp_soil, "pc_1", "pc_2", "gm_pc_1", "gm_pc_2",
-                           "cr_1", "cr_2", "ar_1", "ar_2")) %>%
-  ggplot(aes(x=spp_soil)) +
-  geom_point(aes(y=emmean, shape = spp), 
-             position = position_dodge2(width = 0.3), size = 3) +
-  geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
-                position = position_dodge2(0.3),
-                stat="identity", width = 0.3) + 
-  labs(x="Species", y= "k (nitrogen loss per day)")  +
-  geom_text(aes(x = 1, y = .02, label = "AB")) +
-  geom_text(aes(x = 2, y = .02, label = "A")) +
-  geom_text(aes(x = 3, y = .02, label = "B"))+
-  geom_text(aes(x = 4, y = .02, label = "C")) +
-  scale_x_discrete(labels = c("pc_1" = "Pennycress SA", "pc_2" = "Pennycress DR",
-                              "gm_pc_1" = "GE Pennycress SA", "gm_pc_2" = "GE Pennycress DR",
-                              "cr_1" = "Cereal Rye SA", "cr_2" = "Cereal Rye DR",
-                              "ar_1" = "Annual Rye SA", "ar_2" = "Annual Rye DR")) +
-  scale_shape_manual(name = "Species",
-                     label = c("Pennycress SA", "Pennycress DR", "GE Pennycress SA",
-                               "GE Pennycress DR", "Cereal Rye SA", "Cereal Rye DR",
-                               "Annual Rye SA", "Annual Rye DR"),
-                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
-  expand_limits(ymin = 0.005, ymax = 0.02) +
-  theme_classic()
-
-nitrogen_emm.plot
-
-# contrast emmeans
-nitrogen_contrasts.plot <- nitrogen_k_contrasts.df %>%
-  ggplot(aes(x = trt)) +
-  geom_point(aes(y = emmean, shape = trt), size = 3) +
-  geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), width = 0.3) +
-  geom_text(aes(x = 1, y = .015, label = "CD")) +
-  geom_text(aes(x = 2, y = .015, label = "D")) +
-  geom_text(aes(x = 3, y = .015, label = "AB"))+
-  geom_text(aes(x = 4, y = .015, label = "BCD")) +
-  geom_text(aes(x = 5, y = .015, label = "A")) +
-  geom_text(aes(x = 6, y = .015, label = "A")) +
-  geom_text(aes(x = 7, y = .015, label = "ABC"))+
-  geom_text(aes(x = 8, y = .015, label = "AB")) +
-  scale_x_discrete(labels = c("Annual Rye SA", "Annual Rye DR", "Cereal Rye SA",
-                              "Cereal Rye DR", "LG Pennycress SA", "LG Pennycress DR",
-                              "WT Pennycress SA", "WT Pennycress DR")) +
-  scale_shape_manual(name = "Species",
-                     label = c("Annual Rye SA", "Annual Rye DR", "Cereal Rye SA",
-                               "Cereal Rye DR", "LG Pennycress SA", "LG Pennycress DR",
-                               "WT Pennycress SA", "WT Pennycress DR"),
-                     values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
-  labs(x = "Species and Soil Tye", y = "K (nitrogen loss per day)") +
-  theme_classic() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1)) 
-
-nitrogen_contrasts.plot
 
 # comparing emmeans
-nitrogen_emm.plot + nitrogen_contrasts.plot
+nitrogen.plot + nitrogen_emm.plot + plot_layout(ncol = 1)
 
 # CARBON ----
 
