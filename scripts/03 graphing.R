@@ -183,39 +183,49 @@ nitrogen.plot + nitrogen_emm.plot + plot_layout(ncol = 1)
 
 # mass remaining 
 carbon.plot <- full.df %>%
-  ggplot(mapping = aes(days, pct_c_remain, shape = spp)) +
+  mutate(spp = as.factor(spp)) %>%
+  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
+  ggplot(mapping = aes(days, pct_c_remain, shape = spp, linetype = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_smooth(se = FALSE, color = "black", size = 0.4) +
   labs(x = "Days After Placement", y = "Mean Percent Carbon Remaining") +
   scale_shape_manual(name = "Species", 
-                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
                      values = c(15, 16, 17, 18)) +
+  scale_linetype_manual(name = "Species",
+                        label =
+                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+                        values = c(1, 2, 3, 5)) +
+  labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
   theme_classic()
 
-carbon.plot 
+carbon.plot
 
 # emmeans 
 carbon_emm.plot <- carbon_k_emmeans.df %>%
-  mutate(spp = fct_relevel(spp, "pc", "gm_pc", "cr", "ar")) %>%
-  ggplot(aes(x=spp)) +
+  mutate(spp = fct_relevel(spp, "gm_pc", "pc", "cr", "ar")) %>%
+  ggplot(aes(x=spp, shape = spp)) +
   geom_point(aes(y=emmean), size=3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
   labs(x="Species", y= "k (carbon loss per day)")  +
-  geom_text(aes(x = 1, y = .02, label = "A")) +
-  geom_text(aes(x = 2, y = .02, label = "B")) +
-  geom_text(aes(x = 3, y = .02, label = "C"))+
-  geom_text(aes(x = 4, y = .02, label = "D")) +
-  scale_x_discrete(labels = c("pc" = "Pennycress", "gm_pc"= "GE Pennycress",
+  geom_text(aes(x = 1, y = .007, label = "A")) +
+  geom_text(aes(x = 2, y = .011, label = "B")) +
+  geom_text(aes(x = 3, y = .0155, label = "C"))+
+  geom_text(aes(x = 4, y = .019, label = "D")) +
+  scale_x_discrete(labels = c("pc" = "LG Pennycress", "gm_pc"= "LG Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
-                     label = c("Annual Rye", "Cereal Rye", "GE Pennycress", "Pennycress"),
+                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   theme_classic()
 
 carbon_emm.plot
+
+# carbon plots together
+carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
 
 
 # put them all together
