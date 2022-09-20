@@ -214,7 +214,7 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
   geom_text(aes(x = 2, y = .011, label = "B")) +
   geom_text(aes(x = 3, y = .0155, label = "C"))+
   geom_text(aes(x = 4, y = .019, label = "D")) +
-  scale_x_discrete(labels = c("pc" = "LG Pennycress", "gm_pc"= "LG Pennycress",
+  scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc"= "LG Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
@@ -294,10 +294,26 @@ ratios.df %>%
   labs(x = "Species", y = "Initial Carbon to Nitrogen Ratio") +
   theme_classic()
   
+ratios.df %>%
+  filter(days == 0) %>%
+  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
+  ggplot(mapping = aes(spp, mean, shape = spp)) +
+  geom_point(size = 5) +
+  scale_shape_manual(name = "Species", 
+                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
+                     values = c(15, 16, 17, 18)) +
+  scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
+                              "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
+  geom_text(aes(x = 1, y = 11, label = "Hairy Vetch")) +
+  geom_text(aes(x = 1, y = 57, label = "Corn Stover")) +
+  geom_text(aes(x = 1, y = 24, label = "Ideal Microbial Diet")) +
+  labs(x = "Species", y = "Initial Carbon to Nitrogen Ratio") +
+  theme_classic()
+
+# at cn of 24/25 to 1 there is no leftover carbon or nitrogen!
 
 
-
-
+  
 
 
 
