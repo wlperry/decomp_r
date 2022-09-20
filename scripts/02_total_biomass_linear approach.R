@@ -61,10 +61,31 @@ decomp.df <- decomp.df %>%
 decomp.df %>%
   mutate(spp = as.factor(spp)) %>% 
   mutate(spp = fct_reorder2(spp, days, pct_mass_remain)) %>%
-  ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
+  ggplot(mapping = aes(log(days), log(pct_mass_remain), color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_smooth(method="lm", se=FALSE)+
   theme_classic()
+
+decomp.df %>%
+  mutate(spp = as.factor(spp)) %>% 
+  mutate(spp = fct_reorder2(spp, days, pct_mass_remain)) %>%
+  ggplot(mapping = aes(log(days), log(pct_mass_remain), color = interaction(spp, soil_block))) +
+  # stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_point()+
+  geom_smooth(method="lm", se=FALSE) 
+
+
+decomp.df %>%
+  nest(data=-c(vs)) %>%
+  mutate(
+    fit = map(data,~lm(mpg ~ cyl, data = .x)),
+    fit1 = map(data,~lm(mpg ~ cyl + gear + wt, data = .x))
+  ) %>%
+  gather(name, model, fit:fit1) %>%        # <--- consolidate before tidying
+  mutate(tidied = map(model, tidy)) %>%
+  unnest(tidied)
 
 pc.df <- decomp.df %>% 
   filter(spp=="PC") %>% 
@@ -77,4 +98,29 @@ pc.df %>%
   geom_smooth(method="lm")
 
 
+decomp_log.df <- decomp.df %>% 
+  filter(days !=0 ) %>% 
+  mutate(log_days = log(days),
+         log_pct_mass_remain = log(pct_mass_remain
+                                   ))
 
+k_linear.df <- decomp_log.df %>%
+  nest(data=-c(spp, row_no, soil_block)) %>%
+  mutate(
+    fit = map(data, ~lm(log_pct_mass_remain ~ days, data = .x))
+  ) %>%
+  gather(name, model, fit) %>%        # <--- consolidate before tidying
+  mutate(tidied = map(model, tidy)) %>%
+  unnest(tidied)
+
+k_linear.df <- k_linear.df %>% 
+  arrange(soil_block, spp, row_no)
+
+k_linear_summary.df <- k_linear.df %>% 
+  select (soil_block, spp, row_no, term, estimate, std.error, statistic, p.value) %>% 
+  filter (term=="days")
+
+k_linear_summary.df %>% 
+  ggplot(aes(spp, estimate*-1, color=spp))+
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar")
