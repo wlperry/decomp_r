@@ -94,7 +94,7 @@ decomp.df %>%
 # now to put this in the output
 
 k_nonlinear.df <- decomp.df %>%
-  filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
+  # filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
   # filter(soil_block %in% c(1,2) ) %>%
   nest(data = -c(spp, row_no, soil_block)) %>%
   mutate(
