@@ -39,7 +39,6 @@ decomp.df <- decomp.df %>%
 decomp.df <- decomp.df %>% 
   filter(!is.na(initial_wt_g))
 
-
 # correct for day 0 mass remaining  
 corr_t0.df <- decomp.df %>%
   filter(days == 0) %>%
@@ -77,32 +76,16 @@ decomp.df %>%
   geom_smooth(method="lm", se=FALSE) 
 
 
-decomp.df %>%
-  nest(data=-c(vs)) %>%
-  mutate(
-    fit = map(data,~lm(mpg ~ cyl, data = .x)),
-    fit1 = map(data,~lm(mpg ~ cyl + gear + wt, data = .x))
-  ) %>%
-  gather(name, model, fit:fit1) %>%        # <--- consolidate before tidying
-  mutate(tidied = map(model, tidy)) %>%
-  unnest(tidied)
-
-pc.df <- decomp.df %>% 
-  filter(spp=="PC") %>% 
-  mutate(ln_pct_mass = log(pct_mass_remain +1),
-         ln_day = log(days +1))
-
-pc.df %>% 
-  ggplot(aes(days, ln_pct_mass)) +
-  geom_point() +
-  geom_smooth(method="lm")
-
-
+# filter out day 0 and do log transformations
 decomp_log.df <- decomp.df %>% 
   filter(days !=0 ) %>% 
   mutate(log_days = log(days),
          log_pct_mass_remain = log(pct_mass_remain
                                    ))
+
+# this does all of the regressions for each row and sppecies and soil block
+# saves output to k_linear.df
+# now to put this in the output
 
 k_linear.df <- decomp_log.df %>%
   nest(data=-c(spp, row_no, soil_block)) %>%
@@ -113,14 +96,20 @@ k_linear.df <- decomp_log.df %>%
   mutate(tidied = map(model, tidy)) %>%
   unnest(tidied)
 
+# arrange the data to see easier 
 k_linear.df <- k_linear.df %>% 
   arrange(soil_block, spp, row_no)
 
+# now to get only the k term
 k_linear_summary.df <- k_linear.df %>% 
   select (soil_block, spp, row_no, term, estimate, std.error, statistic, p.value) %>% 
   filter (term=="days")
 
+write_csv(k_linear_summary.df, "output/biomass_linear_k_values.csv")
+
 k_linear_summary.df %>% 
   ggplot(aes(spp, estimate*-1, color=spp))+
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar")
+  stat_summary(fun.data = mean_se, na.rm = TRUE, 
+               geom = "errorbar", width=.2) +
+  labs(x="Species", y="Decay coefficient (k)")
