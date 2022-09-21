@@ -80,8 +80,9 @@ decomp.df %>%
 decomp_log.df <- decomp.df %>% 
   filter(days !=0 ) %>% 
   mutate(log_days = log(days+1,10),
-         log_pct_mass_remain = log(pct_mass_remain,10
-                                   ))
+         log_pct_mass_remain = log(pct_mass_remain,10),
+         prop_mass_remain = pct_mass_remain/100,
+         log_prop_mass_remain = log(prop_mass_remain,10))
 
 # this does all of the regressions for each row and sppecies and soil block
 # saves output to k_linear.df
@@ -90,7 +91,7 @@ decomp_log.df <- decomp.df %>%
 k_linear.df <- decomp_log.df %>%
   nest(data=-c(spp, row_no, soil_block)) %>%
   mutate(
-    fit = map(data, ~lm(log_pct_mass_remain ~ days, data = .x))
+    fit = map(data, ~lm(log_prop_mass_remain ~ log_days, data = .x))
   ) %>%
   gather(name, model, fit) %>%        # <--- consolidate before tidying
   mutate(tidied = map(model, tidy)) %>%
@@ -103,7 +104,7 @@ k_linear.df <- k_linear.df %>%
 # now to get only the k term
 k_linear_summary.df <- k_linear.df %>% 
   select (soil_block, spp, row_no, term, estimate, std.error, statistic, p.value) %>% 
-  filter (term=="days")
+  filter (term=="log_days")
 
 write_csv(k_linear_summary.df, "output/biomass_linear_k_values.csv")
 
