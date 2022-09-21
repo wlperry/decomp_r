@@ -79,8 +79,8 @@ decomp.df %>%
 # filter out day 0 and do log transformations
 decomp_log.df <- decomp.df %>% 
   filter(days !=0 ) %>% 
-  mutate(log_days = log(days),
-         log_pct_mass_remain = log(pct_mass_remain
+  mutate(log_days = log(days+1,10),
+         log_pct_mass_remain = log(pct_mass_remain,10
                                    ))
 
 # this does all of the regressions for each row and sppecies and soil block

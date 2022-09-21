@@ -12,6 +12,8 @@ library(patchwork)
 decomp.df <- read_csv("data/decomp_biomass.csv") %>% clean_names()
 
 # CLEAN DECOMP DATA ----
+decomp.df <- decomp.df %>%
+  arrange(desc(soil_block), spp, row, days)
 
 # make row a number
 decomp.df <- decomp.df %>% 
@@ -56,60 +58,65 @@ decomp.df <- decomp.df %>%
     TRUE ~ pct_mass_remain
   ))
 
+# set proportion column
+decomp.df <- decomp.df %>%
+  mutate(prop_mass_remain = pct_mass_remain/100)
+
 # PLOT TO LOOK AT THE NEGATIVE EXPONENTIALS ----
 decomp.df %>%
-  mutate(spp = as.factor(spp)) %>% 
-  mutate(spp = fct_reorder2(spp, days, pct_mass_remain)) %>%
-  ggplot(mapping = aes(log(days), log(pct_mass_remain), color = spp)) +
+  # filter(soil_block ==2) %>% 
+  ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-  geom_smooth(method="lm", se=FALSE)+
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
   theme_classic()
 
-decomp.df %>%
-  mutate(spp = as.factor(spp)) %>% 
-  mutate(spp = fct_reorder2(spp, days, pct_mass_remain)) %>%
-  ggplot(mapping = aes(log(days), log(pct_mass_remain), color = interaction(spp, soil_block))) +
-  # stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-  geom_point()+
-  geom_smooth(method="lm", se=FALSE) 
+# decomp.df %>%
+#   filter(soil_block ==1) %>% 
+#   ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
+#   geom_point()+
+#   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+#   theme_classic()
 
 
-# filter out day 0 and do log transformations
-decomp_log.df <- decomp.df %>% 
-  filter(days !=0 ) %>% 
-  mutate(log_days = log(days),
-         log_pct_mass_remain = log(pct_mass_remain
-                                   ))
 
-# this does all of the regressions for each row and sppecies and soil block
+# cr.df <- decomp.df %>% 
+#   filter(soil_block ==2) %>% 
+#   filter(spp=="CR") %>% 
+#   filter(row_no ==1)
+# 
+# nonlin = nls(pct_mass_remain ~ 100 * exp(-k*days), trace=TRUE, start = list(k = .01), data=cr.df)
+
+# this does all of the regressions for each row and species and soil block
 # saves output to k_linear.df
 # now to put this in the output
 
-k_linear.df <- decomp_log.df %>%
-  nest(data=-c(spp, row_no, soil_block)) %>%
+k_nonlinear.df <- decomp.df %>%
+  filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
+  # filter(soil_block %in% c(1,2) ) %>%
+  nest(data = -c(spp, row_no, soil_block)) %>%
   mutate(
-    fit = map(data, ~lm(log_pct_mass_remain ~ days, data = .x))
-  ) %>%
+    fit = map(data, ~nls(pct_mass_remain ~ 100 * exp(-k*days), trace =TRUE, 
+                         start = list(k=0.001), 
+                         data = .x))
+    ) %>%
   gather(name, model, fit) %>%        # <--- consolidate before tidying
   mutate(tidied = map(model, tidy)) %>%
   unnest(tidied)
 
 # arrange the data to see easier 
-k_linear.df <- k_linear.df %>% 
+k_nonlinear.df <- k_nonlinear.df %>% 
   arrange(soil_block, spp, row_no)
 
 # now to get only the k term
-k_linear_summary.df <- k_linear.df %>% 
-  select (soil_block, spp, row_no, term, estimate, std.error, statistic, p.value) %>% 
-  filter (term=="days")
+k_nonlinear_summary.df <- k_nonlinear.df %>% 
+  select (soil_block, spp, row_no, term, estimate, std.error, statistic, p.value) 
 
-write_csv(k_linear_summary.df, "output/biomass_linear_k_values.csv")
+write_csv(k_nonlinear_summary.df, "output/biomass_nonlinear_k_values.csv")
 
-k_linear_summary.df %>% 
-  ggplot(aes(spp, estimate*-1, color=spp))+
+k_nonlinear_summary.df %>% 
+  ggplot(aes(spp, estimate, color=spp))+
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar", width=.2) +
   labs(x="Species", y="Decay coefficient (k)")
+
