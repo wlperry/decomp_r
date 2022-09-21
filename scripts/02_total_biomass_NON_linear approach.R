@@ -68,7 +68,10 @@ decomp.df %>%
   ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
-  theme_classic()
+  theme_classic() +
+  geom_smooth( aes(x = days, y = pct_mass_remain, color=spp),
+    method = "nls", formula = y ~ 100 * exp(-k*x), 
+    method.args = list(start = c(k=0.001)), se = FALSE)
 
 # decomp.df %>%
 #   filter(soil_block ==1) %>% 
@@ -118,5 +121,5 @@ k_nonlinear_summary.df %>%
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar", width=.2) +
-  labs(x="Species", y="Decay coefficient (k)")
+  labs(x="Species", y="Decay coefficient (k)") 
 
