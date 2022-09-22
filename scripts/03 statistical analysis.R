@@ -41,7 +41,7 @@ Anova(biomass.lm, type = 3)
 
 # these results look weird so im gonna plot it up quick
 biomass_k.df %>% 
-  ggplot(aes(spp, estimate, color=spp))+
+  ggplot(aes(spp, estimate, color=spp, shape=as.factor(soil_block)))+
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar", width=.2) +
@@ -134,6 +134,7 @@ write_csv(biomass_contrasts_emm.df, file =
 
 # create model ----
 nitrogen.lm = lm(estimate ~ spp * soil_block, data = nitrogen_k.df)
+nitrogen_no_soil.lm = lm(estimate ~ spp, data = nitrogen_k.df)
 
 # check assumptions of model ----
 residuals <- resid(nitrogen.lm)
@@ -145,10 +146,11 @@ qqline(residuals)
 
 # run model ----
 Anova(nitrogen.lm, type = "3")
+Anova(nitrogen_no_soil.lm, type = "3")
 
 # again odd results, going to look at a plot
 nitrogen_k.df %>% 
-  ggplot(aes(spp, estimate, color=spp))+
+  ggplot(aes(spp, estimate, color=spp, shape=as.factor(soil_block)))+
   stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
   stat_summary(fun.data = mean_se, na.rm = TRUE, 
                geom = "errorbar", width=.2) +
@@ -157,6 +159,14 @@ nitrogen_k.df %>%
   theme_classic()
 
 # okay, no significant results here, going to run emmeans to get estimates for plotting ----
+nitrogen_k.df %>% 
+  ggplot(aes(spp, estimate, color=spp))+
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, 
+               geom = "errorbar", width=.2) +
+  labs(x="Species", y="Nitrogen Decay coefficient (k)") +
+  expand_limits(y = 0) +
+  theme_classic()
 
 
 nitrogen.emm <- emmeans(nitrogen.lm, ~ spp)
