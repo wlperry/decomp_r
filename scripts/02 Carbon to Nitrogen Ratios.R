@@ -42,9 +42,9 @@ ratio_soils.df <- ratio_soils.df %>%
   mutate(spp_soil = paste(spp, soil_block, sep = "_"))
 
 # save the output 
-write_csv(summary.df, file = "output/final/c to n ratios.csv")
+write_csv(summary.df, file = "output/carbon to nitrogen ratios/c to n ratios.csv")
 
-write_csv(ratio_soils.df, file = "output/final/ c to n ratios by soil.csv")
+write_csv(ratio_soils.df, file = "output/carbon to nitrogen ratios/ c to n ratios by soil.csv")
 
 
 
