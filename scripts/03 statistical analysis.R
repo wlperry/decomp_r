@@ -158,21 +158,8 @@ nitrogen_k.df %>%
 
 # okay, no significant results here, going to run emmeans to get estimates for plotting ----
 
-# going to run this on treatment 
-nitrogen_k.df <- nitrogen_k.df %>%
-  mutate(spp = as.factor(spp),
-         soil_block = as.factor(soil_block))
 
-nitrogen_k.df <- nitrogen_k.df %>%
-  mutate(trt = paste(spp, soil_block, sep = "_"))
-
-nitrogen_k.df <- nitrogen_k.df %>%
-  mutate(trt = as.factor(trt))
-
-# create emmeans model ----
-nitrogen_trt.lm = lm(estimate ~ trt, data = nitrogen_k.df)
-
-nitrogen.emm <- emmeans(nitrogen_trt.lm, ~ trt)
+nitrogen.emm <- emmeans(nitrogen.lm, ~ spp)
 
 # plot emmeans ----
 plot(nitrogen.emm, comparisons = TRUE)
@@ -182,7 +169,7 @@ plot(nitrogen.emm, comparisons = TRUE)
 multcomp::cld(nitrogen.emm, Letters = letters, adjust = "Bonferroni")
 
 # p-values ----
-emminteraction = emmeans(nitrogen.emm, pairwise ~ trt, 
+emminteraction = emmeans(nitrogen.emm, pairwise ~ spp, 
                          adjust = "bonferroni", alpha = 0.5)
 emminteraction$contrasts
 
@@ -194,7 +181,7 @@ nitrogen_emm.df
 
 # plot contrasts
 nitrogen_emm.df %>%
-  ggplot(aes(x = trt)) +
+  ggplot(aes(x = spp)) +
   geom_point(aes(y = emmean)) +
   geom_errorbar(aes(ymin = emmean - SE, ymax = emmean + SE), stat = "identity", width = 0.2) +
   theme_classic()
