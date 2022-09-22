@@ -66,8 +66,9 @@ decomp.df <- decomp.df %>%
 decomp.df %>%
   # filter(soil_block ==2) %>% 
   ggplot(mapping = aes(days, pct_mass_remain, color = spp)) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  # stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
+  # stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "line") +
+  geom_point(position = position_dodge2(width=5))+
   theme_classic() +
   geom_smooth( aes(x = days, y = pct_mass_remain, color=spp),
     method = "nls", formula = y ~ 100 * exp(-k*x), 
