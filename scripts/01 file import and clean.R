@@ -172,6 +172,25 @@ full_nutrients.df <- full_nutrients.df %>%
   mutate(prop_c_remain = collected_prop_c / initial_prop_c) %>%
   mutate(pct_c_remain = prop_c_remain * 100)
 
+# quick plot
+full_nutrients.df %>%
+  ggplot(mapping = aes(days, pct_n_remain, color = spp)) +
+  geom_point() +
+  scale_x_continuous(limits = c(0, 63), breaks = seq(0, 63, by = 1)) +
+  theme_classic()
+
+# have some trouble outlier days that we need to remove ----
+# remove 7, 21, 28, 49
+unique(full_nutrients.df$days)
+
+full_nutrients.df <- full_nutrients.df %>%
+  filter(days == 0 | days == 14 | days == 35 | days == 63)
+
+# plot again to see how it is
+full_nutrients.df %>%
+  ggplot(mapping = aes(days, pct_n_remain, color = spp)) +
+  geom_point() +
+  theme_classic()
 
 # SAVE FILES TO OUTPUT ----
 
