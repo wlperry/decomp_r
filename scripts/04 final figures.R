@@ -86,7 +86,7 @@ total_biomass_days.plot <- biomass.df %>%
   mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
   ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp, linetype = spp)) + 
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  geom_smooth(se = FALSE, color = "black", size = 0.4, method="loess", span = 1.3) +
   labs(x = "Days After Placement", y = "% Biomass Remaining") +
   scale_shape_manual(name = "Species",
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
@@ -98,6 +98,11 @@ total_biomass_days.plot <- biomass.df %>%
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 45) +
   theme_classic()
+
+  # geom_smooth( aes(x = days, y = pct_mass_remain_corr, color=spp),
+  #              method = "nls", formula = y ~ 100 * exp(-k*x), 
+  #              method.args = list(start = c(k=0.001)), se = FALSE)
+
 
 total_biomass_days.plot
 
