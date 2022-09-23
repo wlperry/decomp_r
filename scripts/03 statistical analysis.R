@@ -282,11 +282,3 @@ carbon_emm.df %>%
 # save file for finalplotting ----
 write_csv(carbon_emm.df, file = 
             "output/statistical results/carbon results.csv")
-
-
-
-
-
-
-
-
