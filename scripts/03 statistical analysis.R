@@ -134,7 +134,6 @@ write_csv(biomass_contrasts_emm.df, file =
 
 # create model ----
 nitrogen.lm = lm(estimate ~ spp * soil_block, data = nitrogen_k.df)
-nitrogen_no_soil.lm = lm(estimate ~ spp, data = nitrogen_k.df)
 
 # check assumptions of model ----
 residuals <- resid(nitrogen.lm)
@@ -146,30 +145,34 @@ qqline(residuals)
 
 # run model ----
 Anova(nitrogen.lm, type = "3")
-Anova(nitrogen_no_soil.lm, type = "3")
 
-# again odd results, going to look at a plot
-nitrogen_k.df %>% 
-  ggplot(aes(spp, estimate, color=spp, shape=as.factor(soil_block)))+
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, 
-               geom = "errorbar", width=.2) +
-  labs(x="Species", y="Nitrogen Decay coefficient (k)") +
-  expand_limits(y = 0) +
-  theme_classic()
+# no significant interaction effect, will drop the interaction and run again ----
+nitrogen_no_interaction.lm = lm(estimate ~ spp + soil_block, data = nitrogen_k.df)
 
-# okay, no significant results here, going to run emmeans to get estimates for plotting ----
-nitrogen_k.df %>% 
-  ggplot(aes(spp, estimate, color=spp))+
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point") +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, 
-               geom = "errorbar", width=.2) +
-  labs(x="Species", y="Nitrogen Decay coefficient (k)") +
-  expand_limits(y = 0) +
-  theme_classic()
+# check assumptions
+residuals <- resid(nitrogen_no_interaction.lm)
+plot(fitted(nitrogen_no_interaction.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
 
+# run new model 
+Anova(nitrogen_no_interaction.lm, type = "3")
 
-nitrogen.emm <- emmeans(nitrogen.lm, ~ spp)
+# soil is not significant drop it from the model ----
+nitrogen_soil.lm = lm(estimate ~ spp, data = nitrogen_k.df)
+
+# check assumptions
+residuals <- resid(nitrogen_soil.lm)
+plot(fitted(nitrogen_soil.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
+
+# run the final model 
+Anova(nitrogen_soil.lm, type ="3")
+
+# significant effect of species, no significant effect of soils 
+
+nitrogen.emm <- emmeans(nitrogen_soil.lm, ~ spp)
 
 # plot emmeans ----
 plot(nitrogen.emm, comparisons = TRUE)
@@ -205,7 +208,7 @@ write_csv(nitrogen_emm.df, file =
 # create model ----
 carbon.lm = lm(estimate ~ spp * soil_block, data = carbon_k.df)
 
-# check assumptions of model ----
+# check assumptions of model 
 residuals <- resid(carbon.lm)
 plot(fitted(carbon.lm), residuals)
 qqnorm(residuals)
@@ -216,8 +219,36 @@ qqline(residuals)
 # run model ----
 Anova(carbon.lm, type = "3")
 
-# no significant effect of species soil interaction or soil, significant effect of species
-# will run emmeans to get estimates and pariwise comparisons ----
+# no significant interaction effect wil drop the interaction ----
+
+carbon_no_interaction.lm = lm(estimate ~ spp + soil_block, data = carbon_k.df)
+
+# check assumptions of model ----
+residuals <- resid(carbon_no_interaction.lm)
+plot(fitted(carbon_no_interaction.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
+
+# ehhhh these are okay, may need to do a log, it looks a little better
+
+# run no interaction model
+Anova(carbon_no_interaction.lm, type = "3")
+
+# log transformation doesn't change the results
+
+# soil is not significant, will drop that from the model ----
+
+carbon_no_soil.lm = lm(estimate ~ spp, data = carbon_k.df)
+
+# check assumptions of model 
+residuals <- resid(carbon_no_interaction.lm)
+plot(fitted(carbon_no_interaction.lm), residuals)
+qqnorm(residuals)
+qqline(residuals)
+
+# run final model 
+Anova(carbon_no_soil.lm, type = "3")
+
 
 # create emmeans model ----
 

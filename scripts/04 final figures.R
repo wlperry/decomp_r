@@ -121,7 +121,7 @@ biomass_contrast.plot <- biomass_k_emmeans.df %>%
   geom_text(aes(x = 2.9, y = .0085, label = "CD"))+
   geom_text(aes(x = 3.1, y = .012, label = "DE")) +
   geom_text(aes(x = 3.9, y = .011, label = "E"))+
-  geom_text(aes(x = 4.1, y = .0145, label = "F")) +
+  geom_text(aes(x = 4.1, y = .0147, label = "F")) +
   scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc" = "LG Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Soil ",
@@ -171,10 +171,10 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
   labs(x="Species", y= " EMM k (nitrogen loss per day)")  +
-  # geom_text(aes(x = 1, y = .007, label = "A")) +
-  # geom_text(aes(x = 2, y = .011, label = "B")) +
-  # geom_text(aes(x = 3, y = .0162, label = "C"))+
-  # geom_text(aes(x = 4, y = .02, label = "D")) +
+  geom_text(aes(x = 1, y = .008, label = "A")) +
+  geom_text(aes(x = 2, y = .010, label = "AB")) +
+  geom_text(aes(x = 3, y = .012, label = "BC"))+
+  geom_text(aes(x = 4, y = .014, label = "C")) +
   scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc"= "LG Pennycress",
                               "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
@@ -238,13 +238,31 @@ carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
 # PUT THE PLOTS TOGETHER FOR THE PAPER ----
 
 # biomass ----
-total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
+final_biomass.plot <- 
+  total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
+
+# save it 
+ggsave(final_biomass.plot, path = "output/figures/final biomass.jpg",
+       units = "in", width = 6, height = 6, dpi = 700)
+
+ggsave("output/figures/final biomass.jpg", final_biomass.plot,
+       width = 7, height = 7, dpi = 700)
 
 # nitrogen ----
-nitrogen_days.plot + nitrogen_contrasts.plot + plot_layout(guides = "collect", ncol = 1)
+final_nitrogen.plot <- 
+  nitrogen_days.plot + nitrogen_emm.plot + plot_layout(guides = "collect", ncol = 1)
+
+# save it
+ggsave("output/figures/final nitrogen.jpg", final_nitrogen.plot,
+       width = 7, height = 7, dpi = 700)
 
 # carbon ----
-carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
+final_carbon.plot <- 
+  carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
+
+#save it 
+ggsave("output/figures/final carbon.jpg", final_carbon.plot,
+       width = 7, height = 7, dpi = 700)
 
 
 # CARBON TO NITROGEN RATIOS PLOTTING ----

@@ -192,6 +192,16 @@ full_nutrients.df %>%
   geom_point() +
   theme_classic()
 
+# think i have a wild outlier for the nitrogen data, need to find it
+full_nutrients.df %>%
+  mutate(soil_block = as.factor(soil_block)) %>%
+  ggplot(mapping = aes(spp, pct_c_remain, color = soil_block, shape = soil_block)) +
+  geom_boxplot() +
+  geom_point(position = position_dodge(width = 1)) +
+  theme_classic()
+
+# looks fine  
+
 # SAVE FILES TO OUTPUT ----
 
 # decomp ----
