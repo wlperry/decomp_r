@@ -47,7 +47,8 @@ k_nonlin_biomass.df <- total_biomass.df %>%
   # mutate(tidied = map(model, tidy)) 
   # unnest(tidied)
   
-  
+  # code is from here
+# https://douglas-watson.github.io/post/2018-09_dplyr_curve_fitting/
 
 with_predicted.df <- k_nonlin_biomass.df %>% 
     mutate(augmented = map(fit, augment)) %>% 
