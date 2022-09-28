@@ -86,7 +86,8 @@ total_biomass_days.plot <- biomass.df %>%
   mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
   ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp, linetype = spp)) + 
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  geom_smooth(se = FALSE, color = "black", size = 0.4, method="loess", span = 1.3) +
+  geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 1) +
   labs(x = "Days After Placement", y = "% Biomass Remaining") +
   scale_shape_manual(name = "Species",
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
@@ -97,11 +98,17 @@ total_biomass_days.plot <- biomass.df %>%
                         values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 45) +
+  ggtitle("A") +
   theme_classic()
 
+# WHAT METHOD DO WE USE FOR SMOOTH LINE???? ----
   # geom_smooth( aes(x = days, y = pct_mass_remain_corr, color=spp),
   #              method = "nls", formula = y ~ 100 * exp(-k*x), 
   #              method.args = list(start = c(k=0.001)), se = FALSE)
+
+# geom_smooth(se = FALSE, color = "black", size = 0.4) +
+
+# geom_smooth(se = FALSE, color = "black", size = 0.4, method="loess", span = 1.3) +
 
 
 total_biomass_days.plot
@@ -118,11 +125,11 @@ biomass_contrast.plot <- biomass_k_emmeans.df %>%
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE, group = soil), 
                 position = position_dodge2(0.3),
                 stat="identity", width = 0.3) + 
-  labs(x="Species", y= "EMM k (biomass loss constant)")  +
+  labs(x="Species", y= "k (biomass loss constant)")  +
   geom_text(aes(x = 0.9, y = .0045, label = "A")) +
   geom_text(aes(x = 1.1, y = .0055, label = "AB")) +
-  geom_text(aes(x = 1.9, y = .0075, label = "ABC")) +
-  geom_text(aes(x = 2.1, y = .008, label = "BC")) +
+  geom_text(aes(x = 1.9, y = .0076, label = "ABC")) +
+  geom_text(aes(x = 2.1, y = .0082, label = "BC")) +
   geom_text(aes(x = 2.9, y = .0085, label = "CD"))+
   geom_text(aes(x = 3.1, y = .012, label = "DE")) +
   geom_text(aes(x = 3.9, y = .011, label = "E"))+
@@ -136,6 +143,7 @@ biomass_contrast.plot <- biomass_k_emmeans.df %>%
                                "Annual Rye SA", "Annual Rye DR"),
                      values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
   expand_limits(ymin = 0.005, ymax = 0.015) +
+  ggtitle("B") +
   theme_classic()
 
 biomass_contrast.plot
@@ -153,6 +161,7 @@ nitrogen_days.plot <- nutrients.df %>%
   ggplot(mapping = aes(days, pct_n_remain, shape = spp, linetype = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
   geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 1) +
   labs(x = "Days After Placement", y = "% Nitrogen Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
@@ -163,6 +172,7 @@ nitrogen_days.plot <- nutrients.df %>%
                         values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
+  ggtitle("A") +
   theme_classic()
 
 nitrogen_days.plot
@@ -175,16 +185,17 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_point(aes(y=emmean), size=3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
-  labs(x="Species", y= " EMM k (nitrogen loss per day)")  +
+  labs(x="Species", y= "k (nitrogen loss constant)")  +
   geom_text(aes(x = 1, y = .008, label = "A")) +
   geom_text(aes(x = 2, y = .010, label = "AB")) +
   geom_text(aes(x = 3, y = .012, label = "BC"))+
   geom_text(aes(x = 4, y = .014, label = "C")) +
-  scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc"= "LG Pennycress",
-                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
+                              "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
+  ggtitle("B") +
   theme_classic()
 
 nitrogen_emm.plot
@@ -201,6 +212,7 @@ carbon.plot <- nutrients.df %>%
   ggplot(mapping = aes(days, pct_c_remain, shape = spp, linetype = spp)) +
   stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
   geom_smooth(se = FALSE, color = "black", size = 0.4) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
   labs(x = "Days After Placement", y = "% Carbon Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
@@ -211,6 +223,7 @@ carbon.plot <- nutrients.df %>%
                         values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
+  ggtitle("A") +
   theme_classic()
 
 carbon.plot
@@ -222,17 +235,18 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
   geom_point(aes(y=emmean), size=3) +
   geom_errorbar(aes(ymin = emmean-SE, ymax = emmean+SE), 
                 stat="identity", width = 0.2) +
-  labs(x="Species", y= " EMM k (carbon loss per day)")  +
+  labs(x="Species", y= "k (carbon loss constant)")  +
   geom_text(aes(x = 1, y = .007, label = "A")) +
   geom_text(aes(x = 2, y = .011, label = "B")) +
   geom_text(aes(x = 3, y = .0162, label = "C"))+
   geom_text(aes(x = 4, y = .02, label = "D")) +
-  scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc"= "LG Pennycress",
-                              "cr" = "Cereal Rye", "ar" = "Annual Rye")) +
+  scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
+                              "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
+  ggtitle("B") +
   theme_classic()
 
 carbon_emm.plot
@@ -247,8 +261,8 @@ final_biomass.plot <-
   total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
 
 # save it 
-ggsave(final_biomass.plot, path = "output/figures/final biomass.jpg",
-       units = "in", width = 6, height = 6, dpi = 700)
+# ggsave(final_biomass.plot, path = "output/figures/final biomass.jpg",
+#        units = "in", width = 6, height = 6, dpi = 700)
 
 ggsave("output/figures/final biomass.jpg", final_biomass.plot,
        width = 7, height = 7, dpi = 700)
@@ -260,6 +274,7 @@ final_nitrogen.plot <-
 # save it
 ggsave("output/figures/final nitrogen.jpg", final_nitrogen.plot,
        width = 7, height = 7, dpi = 700)
+
 
 # carbon ----
 final_carbon.plot <- 

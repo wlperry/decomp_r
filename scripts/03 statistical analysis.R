@@ -96,7 +96,7 @@ contrasts = list(ar1_ar2 = c(1, -1, 0, 0, 0, 0, 0, 0),
                  pc2_gm2 = c(0, 0, 0, 0, 0, 1, 0, -1))
 
 # run test and save as data frame
-biomass_contrasts.df <- as.data.frame(contrast(leastsquare, contrasts, adjust = "sidak"))
+biomass_contrasts.df <- as.data.frame(contrast(leastsquare, contrasts, adjust = "bonferroni"))
 
 # emmeans for final results ----
 # create emmeans model ----
@@ -107,7 +107,7 @@ plot(biomass.emm, comparisons = TRUE)
 
 # mean separation ----
 # where are the differences in groups and what are the emmeans?
-multcomp::cld(biomass.emm, Letters = letters, adjust = "Bonferroni")
+multcomp::cld(biomass.emm, Letters = letters, adjust = "bonferroni")
 
 # p-values ----
 emminteraction = emmeans(biomass.emm, pairwise ~ trt, 
@@ -282,3 +282,4 @@ carbon_emm.df %>%
 # save file for finalplotting ----
 write_csv(carbon_emm.df, file = 
             "output/statistical results/carbon results.csv")
+
