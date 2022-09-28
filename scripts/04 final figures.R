@@ -46,6 +46,20 @@ ratios.df <-
 ratio_soils.df <- 
   read_csv("output/carbon to nitrogen ratios/ c to n ratios by soil.csv")
 
+# READ IN FITTED VALUES FOR PLOTTING ----
+
+# biomass ----
+biomass_fitted.df <- 
+  read_csv("output/final files from import and k calcs/k values/fitted biomass.csv")
+  
+# nitrogen ----
+nitrogen_fitted.df <-
+  read_csv("output/final files from import and k calcs/k values/fitted nitrogen.csv")
+  
+# carbon ----
+carbon_fitted.df <- 
+  read_csv("output/final files from import and k calcs/k values/fitted carbon.csv")
+
 # CLEANING OF FILES ----
 
 # add species to biomass data frame 
@@ -72,6 +86,22 @@ biomass_k_emmeans.df <- biomass_k_emmeans.df %>%
     trt == "AR_1" ~ "1",
     trt == "AR_2" ~ "2"))
 
+# may have to put species and soil block together for the biomass days plot
+biomass_fitted.df <- biomass_fitted.df %>%
+  mutate(trt = paste(spp, soil_block, sep = "_"))
+
+biomass.df <- biomass.df %>%
+  mutate(trt = paste(spp, soil_block, sep = "_"))
+
+biomass_fitted.df <- biomass_fitted.df %>%
+  mutate(trt = as.factor(trt)) %>%
+  mutate(trt = fct_relevel(trt,
+                           "GM_PC_1", "GM_PC_2", "PC_1", "PC_2", "CR_1", "CR_2",
+                           "AR_1", "AR_2")) 
+
+# set up the factors for nitrogen 
+
+
 # rename treatment to spp_soil to work with the graphs i aleady wrote
 biomass_k_emmeans.df<- biomass_k_emmeans.df %>%
   rename(spp_soil = trt)
@@ -80,26 +110,56 @@ biomass_k_emmeans.df<- biomass_k_emmeans.df %>%
 
 # BIOMASS ----
 
+# NEED TO 
+
 # percent remaining
 total_biomass_days.plot <- biomass.df %>%
-  mutate(spp = as.factor(spp)) %>%
-  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
-  ggplot(mapping = aes(days, pct_mass_remain_corr, shape = spp, linetype = spp)) + 
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  geom_smooth(se = FALSE, color = "black", size = 0.4) +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 1) +
+  mutate(spp = as.factor(trt)) %>%
+  mutate(trt = fct_relevel(trt,
+                                "GM_PC_1", "GM_PC_2", "PC_1", "PC_2", "CR_1", "CR_2",
+                                "AR_1", "AR_2")) %>%
+  ggplot(mapping = aes(days, pct_mass_remain, 
+                       shape = as.factor(trt), fill = trt)) + 
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 2,
+               position = position_dodge(width = 5)) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 10,
+               position = position_dodge(width = 5)) +
+  geom_line(data = biomass_fitted.df,
+            aes(x= days, y=.fitted, linetype= as.factor(trt), color = as.factor(trt)))+
   labs(x = "Days After Placement", y = "% Biomass Remaining") +
   scale_shape_manual(name = "Species",
-                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
-                     values = c(15, 16, 17, 18)) +
+                     label = c("LG Pennycress SA","LG Pennycress DR",
+                               "WT Pennycress SA", "WT Pennycress DR", 
+                               "Cereal Rye SA", "Cereal Rye DR",
+                               "Annual Rye SA", "Annual Rye DR"),
+                     values = c(21, 21, 22, 22, 23,23, 24, 24)) +
   scale_linetype_manual(name = "Species",
                         label =
-                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
-                        values = c(1, 2, 3, 5)) +
+                          c("LG Pennycress SA","LG Pennycress DR",
+                            "WT Pennycress SA", "WT Pennycress DR", 
+                            "Cereal Rye SA", "Cereal Rye DR",
+                            "Annual Rye SA", "Annual Rye DR"),
+                        values = c(1, 1, 2, 2, 3, 3, 4, 4)) +
+  scale_fill_manual(name = "Species",
+                     label = c("LG Pennycress SA","LG Pennycress DR",
+                               "WT Pennycress SA", "WT Pennycress DR", 
+                               "Cereal Rye SA", "Cereal Rye DR",
+                               "Annual Rye SA", "Annual Rye DR"),
+                     values = c("black", "gray75", "black", "gray75",
+                                "black", "gray75", "black", "gray75")) +
+  scale_color_manual(name = "Species",
+                    label = c("LG Pennycress SA","LG Pennycress DR",
+                              "WT Pennycress SA", "WT Pennycress DR", 
+                              "Cereal Rye SA", "Cereal Rye DR",
+                              "Annual Rye SA", "Annual Rye DR"),
+                    values = c("black", "gray75", "black", "gray75",
+                               "black", "gray75", "black", "gray75")) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 45) +
   ggtitle("A") +
   theme_classic()
+
+total_biomass_days.plot
 
 # WHAT METHOD DO WE USE FOR SMOOTH LINE???? ----
   # geom_smooth( aes(x = days, y = pct_mass_remain_corr, color=spp),
@@ -144,7 +204,8 @@ biomass_contrast.plot <- biomass_k_emmeans.df %>%
                      values = c(15, 0, 16, 1, 17, 2, 18, 5)) +
   expand_limits(ymin = 0.005, ymax = 0.015) +
   ggtitle("B") +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "none")
 
 biomass_contrast.plot
 
@@ -158,18 +219,21 @@ total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides =
 nitrogen_days.plot <- nutrients.df %>%
    mutate(spp = as.factor(spp)) %>%
    mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
-  ggplot(mapping = aes(days, pct_n_remain, shape = spp, linetype = spp)) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
-  geom_smooth(se = FALSE, color = "black", size = 0.4) +
-  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 1) +
+  ggplot(mapping = aes(days, pct_n_remain, shape = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 2,
+               position = position_dodge(width = 5)) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 10,
+               position = position_dodge(width = 5)) +
+  geom_line(data = nitrogen_fitted.df,
+            aes(x= days, y=.fitted, linetype = as.factor(spp)))+
   labs(x = "Days After Placement", y = "% Nitrogen Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
                      values = c(15, 16, 17, 18)) +
-  scale_linetype_manual(name = "Species",
-                        label =
-                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
-                        values = c(1, 2, 3, 5)) +
+  # scale_linetype_manual(name = "Species",
+  #                       label =
+  #                         c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+  #                       values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
   ggtitle("A") +

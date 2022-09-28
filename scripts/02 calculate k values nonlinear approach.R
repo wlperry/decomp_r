@@ -31,22 +31,32 @@ total_biomass.df %>%
 
 # calculate k values----
 
-# nonlinear equation THIS IS FOR PERCENT MASS REMAINING WITH IT BEING A FUNCTION OF 
-# 100, PROP WOULD BE 1 
 k_nonlin_biomass.df <- total_biomass.df %>%
-   filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
-   filter(soil_block %in% c(1,2) ) %>%
-  nest(data = -c(spp, row_no, soil_block)) %>%
+  filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
+  filter(soil_block %in% c(1,2) ) %>%
+  nest(data = -c(spp, soil_block)) %>%
   mutate(
     fit = map(data, ~nls(pct_mass_remain ~ 100 * exp(-k*days), trace =TRUE, 
                          start = list(k=0.001), 
                          data = .x))
-  ) %>%
-  gather(name, model, fit) %>%        # <--- consolidate before tidying
-  mutate(tidied = map(model, tidy)) %>%
-  unnest(tidied)
+  ) 
 
-# arrange the data to see easier 
+# gather(name, model, fit) %>%         # <--- consolidate before tidying
+# mutate(tidied = map(model, tidy)) 
+# unnest(tidied)
+
+# pull out fitted values for plotting
+biomass_predicted.df <- k_nonlin_biomass.df %>% 
+  mutate(augmented = map(fit, augment)) %>% 
+  unnest(augmented)
+
+# save values for plotting
+write_csv(biomass_predicted.df, file = 
+            "output/final files from import and k calcs/k values/fitted biomass.csv")
+
+
+# arrange the data to see easier - to make this work need to add row number in to the 
+# caluclate k value code in line 37
 k_nonlin_biomass.df <- k_nonlin_biomass.df %>% 
   arrange(soil_block, spp, row_no)
 
@@ -90,20 +100,28 @@ nutrient.df %>%
 
 # calculate k values----
 
-# nonlinear equation THIS IS FOR PERCENT MASS REMAINING WITH IT BEING A FUNCTION OF 
-# 100, PROP WOULD BE 1 
 k_nonlin_nitrogen.df <- nutrient.df %>%
   filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
-  filter(soil_block %in% c(1,2) ) %>%
-  nest(data = -c(spp, row, soil_block)) %>%
+  # filter(soil_block %in% c(1,2) ) %>%
+  nest(data = -c(spp)) %>%
   mutate(
     fit = map(data, ~nls(pct_n_remain ~ 100 * exp(-k*days), trace =TRUE, 
                          start = list(k=0.001), 
                          data = .x))
-  ) %>%
-  gather(name, model, fit) %>%        # <--- consolidate before tidying
-  mutate(tidied = map(model, tidy)) %>%
-  unnest(tidied)
+  ) 
+
+# gather(name, model, fit) %>%         # <--- consolidate before tidying
+# mutate(tidied = map(model, tidy)) 
+# unnest(tidied)
+
+# pull out fitted values for plotting
+nitrogen_predicted.df <- k_nonlin_nitrogen.df %>% 
+  mutate(augmented = map(fit, augment)) %>% 
+  unnest(augmented)
+
+# save values for plotting
+write_csv(nitrogen_predicted.df, file = 
+            "output/final files from import and k calcs/k values/fitted nitrogen.csv")
 
 # arrange the data to see easier 
 k_nonlin_nitrogen.df <- k_nonlin_nitrogen.df %>% 
@@ -144,20 +162,28 @@ nutrient.df %>%
 
 # calculate k values----
 
-# nonlinear equation THIS IS FOR PERCENT MASS REMAINING WITH IT BEING A FUNCTION OF 
-# 100, PROP WOULD BE 1 
 k_nonlin_carbon.df <- nutrient.df %>%
   filter(spp %in% c("PC", "GM_PC", "AR", "CR")) %>%
   filter(soil_block %in% c(1,2) ) %>%
-  nest(data = -c(spp, row, soil_block)) %>%
+  nest(data = -c(spp)) %>%
   mutate(
     fit = map(data, ~nls(pct_c_remain ~ 100 * exp(-k*days), trace =TRUE, 
                          start = list(k=0.001), 
                          data = .x))
-  ) %>%
-  gather(name, model, fit) %>%        # <--- consolidate before tidying
-  mutate(tidied = map(model, tidy)) %>%
-  unnest(tidied)
+  ) 
+
+# gather(name, model, fit) %>%         # <--- consolidate before tidying
+# mutate(tidied = map(model, tidy)) 
+# unnest(tidied)
+
+# pull out fitted values for plotting
+carbon_predicted.df <- k_nonlin_carbon.df %>% 
+  mutate(augmented = map(fit, augment)) %>% 
+  unnest(augmented)
+
+# save values for plotting
+write_csv(carbon_predicted.df, file = 
+            "output/final files from import and k calcs/k values/fitted carbon.csv")
 
 # arrange the data to see easier 
 k_nonlin_carbon.df <- k_nonlin_carbon.df %>% 
