@@ -1,0 +1,31 @@
+---
+title: "Readme"
+author: "Ryan Meyer"
+date: '2022-09-29'
+output: pdf_document
+---
+
+# Overview
+
+This folder contains the results documents and code to read in, clean, analyze, and graph the data from the summer 2021 decomposition study conducted by Meyer et al., (2022) as part of the USDA Agriculture and Food Research Initiative Competitive Grant No. 2019-69012-29851.
+
+# Folders
+
+## Scripts
+
+Scripts are organized numerically in the order in which they should be run. 
+
+- 01 Imports, cleans, and saves the data into the output folder to calculate the k values in 02.
+
+- 02 "calculate k values nonlinear approach" uses negative exponential nonlinear modeling to calculate the k values for analysis and fitted values for plotting. NOTE: Because different columns were needed for plotting and analysis to calculate and save the values for either plotting or analysis you will need to change the columns specified in the statements that run the nonlinear model. 
+
+- 02 "Carbon to Nitrogen ratios" calculates and saves the carbon to nitrogen ratios as outputs for plotting
+
+- 03 Conducts statistical analysis using generalized linear models to determine the differences in biomass loss, nitrogen mineralization, and carbon minearlization by species and soil type. It then saves relevant values to output for plotting.
+
+- 04 Final figures reads in all relevant files from output for final plotting. Some modifications to data frames are needed for plotting and these modifications are dont at the top of the document. 
+
+
+
+
+
