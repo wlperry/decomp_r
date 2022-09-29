@@ -86,7 +86,7 @@ biomass_k_emmeans.df <- biomass_k_emmeans.df %>%
     trt == "AR_1" ~ "1",
     trt == "AR_2" ~ "2"))
 
-# may have to put species and soil block together for the biomass days plot
+# set up factor for biomass fitted
 biomass_fitted.df <- biomass_fitted.df %>%
   mutate(trt = paste(spp, soil_block, sep = "_"))
 
@@ -99,7 +99,16 @@ biomass_fitted.df <- biomass_fitted.df %>%
                            "GM_PC_1", "GM_PC_2", "PC_1", "PC_2", "CR_1", "CR_2",
                            "AR_1", "AR_2")) 
 
-# set up the factors for nitrogen 
+# set up the factors for nitrogen fitted
+nitrogen_fitted.df <- nitrogen_fitted.df %>%
+mutate(spp = as.factor(spp)) %>%
+  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR"))
+
+# set up the factors for carbon fitted 
+carbon_fitted.df <- carbon_fitted.df %>%
+  mutate(spp = as.factor(spp)) %>%
+  mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR"))
+
 
 
 # rename treatment to spp_soil to work with the graphs i aleady wrote
@@ -109,8 +118,6 @@ biomass_k_emmeans.df<- biomass_k_emmeans.df %>%
 # FIGURES ----
 
 # BIOMASS ----
-
-# NEED TO 
 
 # percent remaining
 total_biomass_days.plot <- biomass.df %>%
@@ -158,18 +165,6 @@ total_biomass_days.plot <- biomass.df %>%
   expand_limits(y = 45) +
   ggtitle("A") +
   theme_classic()
-
-total_biomass_days.plot
-
-# WHAT METHOD DO WE USE FOR SMOOTH LINE???? ----
-  # geom_smooth( aes(x = days, y = pct_mass_remain_corr, color=spp),
-  #              method = "nls", formula = y ~ 100 * exp(-k*x), 
-  #              method.args = list(start = c(k=0.001)), se = FALSE)
-
-# geom_smooth(se = FALSE, color = "black", size = 0.4) +
-
-# geom_smooth(se = FALSE, color = "black", size = 0.4, method="loess", span = 1.3) +
-
 
 total_biomass_days.plot
 
@@ -230,10 +225,10 @@ nitrogen_days.plot <- nutrients.df %>%
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
                      values = c(15, 16, 17, 18)) +
-  # scale_linetype_manual(name = "Species",
-  #                       label =
-  #                         c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
-  #                       values = c(1, 2, 3, 5)) +
+  scale_linetype_manual(name = "Species",
+                        label =
+                          c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
+                        values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
   ggtitle("A") +
@@ -260,7 +255,8 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
   ggtitle("B") +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "none")
 
 nitrogen_emm.plot
 
@@ -273,10 +269,13 @@ nitrogen_days.plot + nitrogen_emm.plot + plot_layout(guides = "collect", ncol = 
 carbon.plot <- nutrients.df %>%
   mutate(spp = as.factor(spp)) %>%
   mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
-  ggplot(mapping = aes(days, pct_c_remain, shape = spp, linetype = spp)) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 4) +
-  geom_smooth(se = FALSE, color = "black", size = 0.4) +
-  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 3) +
+  ggplot(mapping = aes(days, pct_c_remain, shape = spp)) +
+  stat_summary(fun = mean, na.rm = TRUE, geom = "point", size = 2,
+               position = position_dodge(width = 5)) +
+  stat_summary(fun.data = mean_se, na.rm = TRUE, geom = "errorbar", width = 10,
+               position = position_dodge(width = 5)) +
+  geom_line(data = carbon_fitted.df,
+            aes(x= days, y=.fitted, linetype = as.factor(spp)))+
   labs(x = "Days After Placement", y = "% Carbon Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", " Annual Rye"),
@@ -291,6 +290,7 @@ carbon.plot <- nutrients.df %>%
   theme_classic()
 
 carbon.plot
+
 
 # emmeans 
 carbon_emm.plot <- carbon_k_emmeans.df %>%
@@ -311,7 +311,8 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   ggtitle("B") +
-  theme_classic()
+  theme_classic() +
+  theme(legend.position = "none")
 
 carbon_emm.plot
 
@@ -323,10 +324,6 @@ carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
 # biomass ----
 final_biomass.plot <- 
   total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
-
-# save it 
-# ggsave(final_biomass.plot, path = "output/figures/final biomass.jpg",
-#        units = "in", width = 6, height = 6, dpi = 700)
 
 ggsave("output/figures/final biomass.jpg", final_biomass.plot,
        width = 7, height = 7, dpi = 700)
@@ -342,7 +339,7 @@ ggsave("output/figures/final nitrogen.jpg", final_nitrogen.plot,
 
 # carbon ----
 final_carbon.plot <- 
-  carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
+  carbon.plot + carbon_emm.plot + plot_layout(guides = "collect", ncol = 1)
 
 #save it 
 ggsave("output/figures/final carbon.jpg", final_carbon.plot,
@@ -350,34 +347,33 @@ ggsave("output/figures/final carbon.jpg", final_carbon.plot,
 
 
 # CARBON TO NITROGEN RATIOS PLOTTING ----
-
-# just looking at initial carbon to nitrogen ratio by species
-ratios.df %>%
-  filter(days == 0) %>%
-  ggplot(mapping = aes(spp, mean, shape = spp)) +
-  geom_point(size = 3) +
-  scale_shape_manual(name = "Species", 
-                     label = c("Annual Rye", "Cereal Rye", "LG Pennycress", " WT Pennycress"),
-                     values = c(15, 16, 17, 18)) +
-  labs(x = "Species", y = "Initial Carbon to Nitrogen Ratio") +
-  theme_classic()
   
 # with comparisons to other papers and sources
-ratios.df %>%
+cn.plot <- ratios.df %>%
   filter(days == 0) %>%
   mutate(spp = fct_relevel(spp, "GM_PC", "PC", "CR", "AR")) %>%
   ggplot(mapping = aes(spp, mean, shape = spp)) +
-  geom_point(size = 5) +
+  geom_point(size = 3) +
+  geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), stat = "identity", width = 0.2) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
   scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
                               "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
-  geom_text(aes(x = 1, y = 11, label = "Hairy Vetch")) +
-  geom_text(aes(x = 1, y = 57, label = "Corn Stover")) +
-  geom_text(aes(x = 1, y = 24, label = "Ideal Microbial Diet")) +
-  labs(x = "Species", y = "Initial Carbon to Nitrogen Ratio") +
+  geom_text(aes(x = 0, y = 12, hjust = -0.1, label = "Hairy Vetch")) +
+  geom_text(aes(x = 0, y = 58, hjust = -0.1, label = "Corn Stover")) +
+  geom_text(aes(x = 0, y = 25, hjust = -0.1, label = "IMD")) +
+  labs(x = "Species", y = "Initial Carbon-to-Nitrogen Ratio") +
+  geom_hline(yintercept = 11, linetype = 2) +
+  geom_hline(yintercept = 57, linetype = 2) +
+  geom_hline(yintercept = 24, linetype = 2) +
   theme_classic()
+
+cn.plot
+
+ggsave("output/figures/carbon to nitrogen.jpg", cn.plot,
+       width = 7, height = 7, dpi = 700)
+
 
 # at cn of 24/25 to 1 there is no leftover carbon or nitrogen!
 
