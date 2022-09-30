@@ -11,6 +11,32 @@ This folder contains the results documents and code to read in, clean, analyze, 
 
 # Folders
 
+## Data
+
+This folder contains raw data that is read into the import and clean script. 
+
+## Folder Archive
+
+Contains folder that are no longer needed or used. 
+
+## Output 
+
+This is where all outputs from importing, cleaning, calculations, and statistical results are stored. Organized by:
+
+- archived output: outputs that are no longer used but may be useful to keep around for reference
+
+- carbon to nitrogen ratios: contains outputs with the carbon to nitrogen ratio calculations
+
+- figures: this is where final figures are saved at high resolution for publication
+
+- final files from import and k calcs
+
+  - from import and clean: cleaned data files from import and clean
+  
+  - k vales: contains cleaned k value files from 02 calculate k values nonlinear approach
+  
+- statistical results: summaries of statistical results with estimated marginal means and letter for statistical groupings, these are primarily used for plotting statistical results
+
 ## Scripts
 
 Scripts are organized numerically in the order in which they should be run. 
