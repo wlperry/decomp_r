@@ -117,7 +117,7 @@ biomass_k_emmeans.df<- biomass_k_emmeans.df %>%
 
 # FIGURES ----
 
-# BIOMASS ----
+# biomass ----
 
 # percent remaining
 total_biomass_days.plot <- biomass.df %>%
@@ -139,7 +139,7 @@ total_biomass_days.plot <- biomass.df %>%
                                "WT Pennycress SA", "WT Pennycress DR", 
                                "Cereal Rye SA", "Cereal Rye DR",
                                "Annual Rye SA", "Annual Rye DR"),
-                     values = c(21, 21, 22, 22, 23,23, 24, 24)) +
+                     values = c(22, 22, 21, 21, 23,23, 24, 24)) +
   scale_linetype_manual(name = "Species",
                         label =
                           c("LG Pennycress SA","LG Pennycress DR",
@@ -208,7 +208,7 @@ biomass_contrast.plot
 total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
 
 
-# NITROGEN ----
+# nitrogen ----
 
 # mass remaining 
 nitrogen_days.plot <- nutrients.df %>%
@@ -263,7 +263,7 @@ nitrogen_emm.plot
 # full
 nitrogen_days.plot + nitrogen_emm.plot + plot_layout(guides = "collect", ncol = 1)
 
-# CARBON ----
+# carbon ----
 
 # mass remaining 
 carbon.plot <- nutrients.df %>%
