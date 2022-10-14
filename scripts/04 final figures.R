@@ -137,27 +137,27 @@ total_biomass_days.plot <- biomass.df %>%
   scale_shape_manual(name = "Species",
                      label = c("LG Pennycress SA","LG Pennycress DR",
                                "WT Pennycress SA", "WT Pennycress DR", 
-                               "Cereal Ryegrass SA", "Cereal Ryegrass DR",
+                               "Cereal Rye SA", "Cereal Rye DR",
                                "Annual Ryegrass SA", "Annual Ryegrass DR"),
                      values = c(22, 22, 21, 21, 24, 24, 23, 23)) +
   scale_linetype_manual(name = "Species",
                         label =
                           c("LG Pennycress SA","LG Pennycress DR",
                             "WT Pennycress SA", "WT Pennycress DR", 
-                            "Cereal Ryegrass SA", "Cereal Ryegrass DR",
+                            "Cereal Rye SA", "Cereal Rye DR",
                             "Annual Ryegrass SA", "Annual Ryegrass DR"),
                         values = c(1, 1, 2, 2, 3, 3, 4, 4)) +
   scale_fill_manual(name = "Species",
                      label = c("LG Pennycress SA","LG Pennycress DR",
                                "WT Pennycress SA", "WT Pennycress DR", 
-                               "Cereal Ryegrass SA", "Cereal Ryegrass DR",
+                               "Cereal Rye SA", "Cereal Rye DR",
                                "Annual Ryegrass SA", "Annual Ryegrass DR"),
                      values = c("black", "gray75", "black", "gray75",
                                 "black", "gray75", "black", "gray75")) +
   scale_color_manual(name = "Species",
                     label = c("LG Pennycress SA","LG Pennycress DR",
                               "WT Pennycress SA", "WT Pennycress DR", 
-                              "Cereal Ryegrass SA", "Cereal Ryegrass DR",
+                              "Cereal Rye SA", "Cereal Rye DR",
                               "Annual Ryegrass SA", "Annual Ryegrass DR"),
                     values = c("black", "gray75", "black", "gray75",
                                "black", "gray75", "black", "gray75")) +
@@ -190,17 +190,17 @@ biomass_contrast.plot <- biomass_k_emmeans.df %>%
   geom_text(aes(x = 3.9, y = .011, label = "E"))+
   geom_text(aes(x = 4.1, y = .0147, label = "F")) +
   scale_x_discrete(labels = c("pc" = "WT Pennycress", "gm_pc" = "LG Pennycress",
-                              "cr" = "Cereal Ryegrass", "ar" = "Annual Ryegrass")) +
+                              "cr" = "Cereal Rye", "ar" = "Annual Ryegrass")) +
   scale_shape_manual(name = "Soil ",
                      label = c("LG Pennycress SA","LG Pennycress DR",
                                "WT Pennycress SA", "WT Pennycress DR", 
                                "Cereal Rye SA", "Cereal Rye DR",
-                               "Annual Rye SA", "Annual Rye DR"),
+                               "Annual Ryegrass SA", "Annual Ryegrass DR"),
                      values = c(22, 22, 21, 21, 24, 24, 23, 23)) +
   scale_fill_manual(name = "Soil",
                     label = c("LG Pennycress SA","LG Pennycress DR",
                               "WT Pennycress SA", "WT Pennycress DR", 
-                              "Cereal Ryegrass SA", "Cereal Ryegrass DR",
+                              "Cereal Rye SA", "Cereal Rye DR",
                               "Annual Ryegrass SA", "Annual Ryegrass DR"),
                     values = c("black", "gray75", "black", "gray75",
                                "black", "gray75", "black", "gray75")) +
@@ -231,12 +231,12 @@ nitrogen_days.plot <- nutrients.df %>%
   labs(x = "Days After Placement", y = "% Nitrogen Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", 
-                               "Cereal Ryegrass", " Annual Ryegrass"),
+                               "Cereal Rye", " Annual Ryegrass"),
                      values = c(15, 16, 17, 18)) +
   scale_linetype_manual(name = "Species",
                         label =
                           c("LG Pennycress", "WT Pennycress", 
-                            "Cereal Ryegrass", " Annual Ryegrass"),
+                            "Cereal Rye", " Annual Ryegrass"),
                         values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
@@ -259,10 +259,10 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_text(aes(x = 3, y = .012, label = "BC"))+
   geom_text(aes(x = 4, y = .014, label = "C")) +
   scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
-                              "CR" = "Cereal Ryegrass", "AR" = "Annual Ryegrass")) +
+                              "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", 
-                               "Cereal Ryegrass", "Annual Ryegrass"),
+                               "Cereal Rye", "Annual Rye"),
                      values = c(15, 16, 17, 18)) +
   ggtitle("B") +
   theme_classic() +
@@ -289,12 +289,12 @@ carbon.plot <- nutrients.df %>%
   labs(x = "Days After Placement", y = "% Carbon Remaining") +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", 
-                               "Cereal Ryegrass", " Annual Ryegrass"),
+                               "Cereal Rye", " Annual Ryegrass"),
                      values = c(15, 16, 17, 18)) +
   scale_linetype_manual(name = "Species",
                         label =
                           c("LG Pennycress", "WT Pennycress", 
-                            "Cereal Ryegrass", " Annual Ryegrass"),
+                            "Cereal Rye", " Annual Ryegrass"),
                         values = c(1, 2, 3, 5)) +
   labs(shape = "Species", linetype = "Species") +
   expand_limits(y = 25) +
@@ -317,10 +317,10 @@ carbon_emm.plot <- carbon_k_emmeans.df %>%
   geom_text(aes(x = 3, y = .0162, label = "C"))+
   geom_text(aes(x = 4, y = .02, label = "D")) +
   scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
-                              "CR" = "Cereal Ryegrass", "AR" = "Annual Ryegrass")) +
+                              "CR" = "Cereal Rye", "AR" = "Annual Ryegrass")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", 
-                               "Cereal Ryegrass", "Annual Ryegrass"),
+                               "Cereal Rye", "Annual Ryegrass"),
                      values = c(15, 16, 17, 18)) +
   expand_limits(ymin = 0.005, ymax = 0.02) +
   ggtitle("B") +
@@ -338,12 +338,16 @@ carbon.plot + carbon_emm.plot + plot_layout(ncol = 1)
 final_biomass.plot <- 
   total_biomass_days.plot + biomass_contrast.plot + plot_layout(ncol = 1, guides = "collect")
 
+final_biomass.plot
+
 ggsave("output/figures/final biomass.jpg", final_biomass.plot,
        width = 7, height = 7, dpi = 700)
 
 # nitrogen ----
 final_nitrogen.plot <- 
   nitrogen_days.plot + nitrogen_emm.plot + plot_layout(guides = "collect", ncol = 1)
+
+final_nitrogen.plot
 
 # save it
 ggsave("output/figures/final nitrogen.jpg", final_nitrogen.plot,
@@ -353,6 +357,8 @@ ggsave("output/figures/final nitrogen.jpg", final_nitrogen.plot,
 # carbon ----
 final_carbon.plot <- 
   carbon.plot + carbon_emm.plot + plot_layout(guides = "collect", ncol = 1)
+
+final_carbon.plot
 
 #save it 
 ggsave("output/figures/final carbon.jpg", final_carbon.plot,
@@ -369,10 +375,10 @@ cn.plot <- ratios.df %>%
   geom_point(size = 3) +
   geom_errorbar(aes(ymin = mean-sd, ymax = mean+sd), stat = "identity", width = 0.2) +
   scale_shape_manual(name = "Species", 
-                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Rye"),
+                     label = c("LG Pennycress", "WT Pennycress", "Cereal Rye", "Annual Ryegrass"),
                      values = c(15, 16, 17, 18)) +
   scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
-                              "CR" = "Cereal Ryegrass", "AR" = "Annual Ryegrass")) +
+                              "CR" = "Cereal Rye", "AR" = "Annual Ryegrass")) +
   geom_text(aes(x = 0, y = 12, hjust = -0.1, label = "Hairy Vetch")) +
   geom_text(aes(x = 0, y = 58, hjust = -0.1, label = "Corn Stover")) +
   geom_text(aes(x = 0, y = 25, hjust = -0.1, label = "IMD")) +
