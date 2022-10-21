@@ -143,7 +143,7 @@ total_biomass_days.plot <- biomass.df %>%
   scale_linetype_manual(name = "Species",
                         label =
                           c("LG Pennycress SA","LG Pennycress DR",
-                            "WT Pennycress SA", "WT Pennycress DR", 
+                            "WT Pennycress SA", "WT Pennycress DR",
                             "Cereal Rye SA", "Cereal Rye DR",
                             "Annual Ryegrass SA", "Annual Ryegrass DR"),
                         values = c(1, 1, 2, 2, 3, 3, 4, 4)) +
@@ -259,10 +259,10 @@ nitrogen_emm.plot <- nitrogen_k_emmeans.df %>%
   geom_text(aes(x = 3, y = .012, label = "BC"))+
   geom_text(aes(x = 4, y = .014, label = "C")) +
   scale_x_discrete(labels = c("PC" = "WT Pennycress", "GM_PC"= "LG Pennycress",
-                              "CR" = "Cereal Rye", "AR" = "Annual Rye")) +
+                              "CR" = "Cereal Rye", "AR" = "Annual Ryegrass")) +
   scale_shape_manual(name = "Species", 
                      label = c("LG Pennycress", "WT Pennycress", 
-                               "Cereal Rye", "Annual Rye"),
+                               "Cereal Rye", "Annual Ryegrass"),
                      values = c(15, 16, 17, 18)) +
   ggtitle("B") +
   theme_classic() +
