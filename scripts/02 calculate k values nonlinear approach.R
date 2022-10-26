@@ -11,7 +11,7 @@ library(patchwork)
 
 # read in the data ----
 total_biomass.df <- 
-  read_csv("output/final files from import and k calcs/from import and clean/total biomass.csv")
+  read_csv("output/cleaned data and estimates of k/from import and clean/total biomass.csv")
 
 # make column for proportion 
 total_biomass.df <- total_biomass.df %>%
@@ -52,7 +52,7 @@ biomass_predicted.df <- k_nonlin_biomass.df %>%
 
 # save values for plotting
 write_csv(biomass_predicted.df, file = 
-            "output/final files from import and k calcs/k values/fitted biomass.csv")
+            "output/cleaned data and estimates of k/k values/fitted biomass.csv")
 
 
 # arrange the data to see easier - to make this work need to add row number in to the 

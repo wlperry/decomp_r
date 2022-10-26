@@ -13,11 +13,11 @@ This folder contains the results documents and code to read in, clean, analyze, 
 
 ## Data
 
-This folder contains raw data that is read into the import and clean script. 
+This folder contains raw data. 
 
 ## Folder Archive
 
-Contains folder that are no longer needed or used. 
+Contains folders and documents used to help with analysis and data exploration, but are not used for analysis
 
 ## Output 
 
@@ -27,9 +27,7 @@ This is where all outputs from importing, cleaning, calculations, and statistica
 
 - carbon to nitrogen ratios: contains outputs with the carbon to nitrogen ratio calculations
 
-- figures: this is where final figures are saved at high resolution for publication
-
-- final files from import and k calcs
+- cleaned data and estiamtes of k 
 
   - from import and clean: cleaned data files from import and clean
   
@@ -51,6 +49,9 @@ Scripts are organized numerically in the order in which they should be run.
 
 - 04 Final figures reads in all relevant files from output for final plotting. Some modifications to data frames are needed for plotting and these modifications are dont at the top of the document. 
 
+## Figures
+
+- Contains high resolution 7x7in .jpg figures of results.
 
 
 

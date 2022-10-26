@@ -65,7 +65,7 @@ unique(decomp.df$days)
 nutrients.df <- read_csv("data/decomp_biomass.csv") %>% clean_names()
 
 # n data 
-n_data.df <- read.csv("Data/Decomp/n with data.csv") %>%
+n_data.df <- read.csv("Data/n with data.csv") %>%
   clean_names() %>%
   remove_empty(which = c("cols", "rows"))
 
