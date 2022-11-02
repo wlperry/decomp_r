@@ -60,8 +60,7 @@ k_nonlin_biomass_summary.df <- k_nonlin_biomass_summary.df %>%
 # save output ----
 
 write_csv(k_nonlin_biomass_summary.df, file =
-            "output/cleaned data and estimates of k/k values/for analysis/
-          k nonlin biomass summary.csv")
+            "output/cleaned data and estimates of k/k values/for analysis/k nonlin biomass summary.csv")
 
 # plot the values ----
 biomass.plot <- k_nonlin_biomass_summary.df %>% 
@@ -120,8 +119,7 @@ k_nonlin_nitrogen_summary.df <- k_nonlin_nitrogen_summary.df %>%
 # save output ----
 
 write_csv(k_nonlin_nitrogen_summary.df, file =
-            "output/cleaned data and estimates of k/k values/for analysis/
-          k nonlin nitrogen summary.csv")
+            "output/cleaned data and estimates of k/k values/for analysis/k nonlin nitrogen summary.csv")
      
 
 nitrogen.plot <- k_nonlin_nitrogen_summary.df %>% 
@@ -176,8 +174,7 @@ k_nonlin_carbon_summary.df <- k_nonlin_carbon_summary.df %>%
 # save output ----
 
 write_csv(k_nonlin_carbon_summary.df, file =
-            "output/cleaned data and estimates of k/k values/for analysis/
-          k nonlin carbon summary.csv")
+            "output/cleaned data and estimates of k/k values/for analysis/k nonlin carbon summary.csv")
 
 
 carbon.plot <- k_nonlin_carbon_summary.df %>% 

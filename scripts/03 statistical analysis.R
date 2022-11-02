@@ -13,15 +13,15 @@ library(lsmeans)
 
 # biomass 
 biomass_k.df <- 
-  read_csv("output/final files from import and k calcs/k values/k nonlin biomass summary.csv")
+  read_csv("output/cleaned data and estimates of k/k values/for analysis/k nonlin biomass summary.csv")
 
 # nitrogen 
 nitrogen_k.df <- 
-  read_csv("output/final files from import and k calcs/k values/k nonlin nitrogen summary.csv")
+  read_csv("output/cleaned data and estimates of k/k values/for analysis/k nonlin nitrogen summary.csv")
 
 # carbon
 carbon_k.df <- 
-  read_csv("output/final files from import and k calcs/k values/k nonlin carbon summary.csv")
+  read_csv("output/cleaned data and estimates of k/k values/for analysis/k nonlin carbon summary.csv")
 
 # BIOMASS ANALYSIS ----
 
