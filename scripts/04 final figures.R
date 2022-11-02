@@ -19,15 +19,15 @@ library(patchwork)
 
 # full nitrogen and carbon data ----
 nutrients.df <- 
-  read_csv("output/final files from import and k calcs/from import and clean/nutrients.csv")
+  read_csv("output/cleaned data and estimates of k/from import and clean/nutrients.csv")
 
 # full decomp data ----
-biomass.df <- 
-  read_csv("output/final files from import and k calcs/from import and clean/total biomass.csv")
+biomass.df <-
+  read_csv("output/cleaned data and estimates of k/from import and clean/total biomass.csv")
 
 # now we load in the emmeans for those plots 
 # biomass ----
-biomass_k_emmeans.df <- 
+biomass_k_emmeans.df <-
   read_csv("output/statistical results/biomass results.csv")
 
 # nitrogen ----
@@ -49,16 +49,16 @@ ratio_soils.df <-
 # READ IN FITTED VALUES FOR PLOTTING ----
 
 # biomass ----
-biomass_fitted.df <- 
-  read_csv("output/final files from import and k calcs/k values/fitted biomass.csv")
+biomass_fitted.df <-
+  read_csv("output/cleaned data and estimates of k/k values/for plotting/fitted biomass.csv")
   
 # nitrogen ----
 nitrogen_fitted.df <-
-  read_csv("output/final files from import and k calcs/k values/fitted nitrogen.csv")
-  
+  read_csv("output/cleaned data and estimates of k/k values/for plotting/fitted nitrogen.csv")
+
 # carbon ----
 carbon_fitted.df <- 
-  read_csv("output/final files from import and k calcs/k values/fitted carbon.csv")
+  read_csv("output/cleaned data and estimates of k/k values/for plotting/fitted nitrogen.csv")
 
 # CLEANING OF FILES ----
 
