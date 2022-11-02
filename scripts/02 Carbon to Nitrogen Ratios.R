@@ -6,9 +6,8 @@
 library(tidyverse)
 
 # READ IN DATA ----
-
-#
-full.df <- read_csv("data/cleaned/clean nitrogen.csv")
+full.df <-
+  read_csv("output/cleaned data and estimates of k/from import and clean/nutrients.csv")
 
 # TRANSFORMATIONS
 
